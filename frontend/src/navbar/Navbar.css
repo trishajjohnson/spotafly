@@ -1,0 +1,13 @@
+.navbar-custom {
+    display: flex !important;
+    justify-content: space-between !important;
+    padding-bottom: 0 !important;
+}
+
+.xtra-margin {
+    margin-right: 20px !important;
+}
+
+.link {
+    color: white !important;
+}
