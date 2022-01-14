@@ -1,0 +1,11 @@
+.genre-col {
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    padding: 0 !important;
+}
+
+.GenreList {
+    /* display: grid; */
+    width: 70% !important;
+}

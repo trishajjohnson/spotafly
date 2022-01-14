@@ -26,7 +26,6 @@ function SignupForm({signup}) {
   async function handleSubmit(evt) {
     evt.preventDefault();
     let res = await signup(formData);
-    console.log("res in handleSubmit of SignupForm.js", res)
     if(res.success) {
         history.push('/');
     } else {

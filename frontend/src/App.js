@@ -7,7 +7,7 @@ import LoadingSpinner from "./common/LoadingSpinner";
 import jwt from "jsonwebtoken";
 import './App.css';
 
-const STORE_TOKEN_ID = "access_token";
+const STORE_TOKEN_ID = "token-id";
 
 function App() {
   const [infoLoaded, setInfoLoaded] = useState(false);
@@ -21,11 +21,10 @@ function App() {
     async function getCurrentUser() {
       if (token) {
         try {
-          console.log("token", token)
-          let { username, access_token } = jwt.decode(token);
-          SpotaflyApi.token = access_token;
-          let currentUser = await SpotaflyApi.getCurrentUser(username);
-          setCurrentUser(currentUser);
+          let {username} = jwt.decode(token);
+          SpotaflyApi.token = token;
+          let currUser = await SpotaflyApi.getCurrentUser(username);
+          setCurrentUser(currUser);
           // setFavoriteSongIds(new Set(currentUser.favoriteSongs));
           // setFollowedArtistIds(new Set(currentUser.followedArtists));
         } catch(e) {
@@ -42,7 +41,8 @@ function App() {
   async function login(loginData) {
     try {
       let token = await SpotaflyApi.login(loginData);
-      localStorage.setItem(STORE_TOKEN_ID, token);
+      console.log("token in login of App.js", token.token)
+      localStorage.setItem(STORE_TOKEN_ID, token.token);
       setToken(localStorage.getItem(STORE_TOKEN_ID));
       return { success: true };
     } catch(e) {
@@ -53,9 +53,7 @@ function App() {
 
   async function signup(signupData) {
     try {
-      console.log("inside try of signup function in App.js frontend")
       let token = await SpotaflyApi.signup(signupData);
-      console.log("after SpotaflyApi call in signup function App.js")
       localStorage.setItem(STORE_TOKEN_ID, token);
       setToken(localStorage.getItem(STORE_TOKEN_ID));
       return { success: true };

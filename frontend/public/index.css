@@ -1,0 +1,7 @@
+body {
+    background-image: url("https://swall.teahub.io/photos/small/341-3414442_free-art-wallpaper-bright-colors.jpg");
+    background-repeat: no-repeat;
+    background-attachment: fixed !important;
+    /* height: 100vh; */
+    background-size: cover;
+}

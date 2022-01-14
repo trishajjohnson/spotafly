@@ -1,0 +1,29 @@
+.searchForm-btn {
+    border: 1px solid black !important;
+    border-radius: 25px !important;
+    text-align: left !important;
+}
+
+.searchForm-btn:hover {
+    background-color: rgba(0, 0, 0, 0.178);   
+}
+
+.form-input {
+    width: 50%;
+    margin: 0 auto;
+    display: inline-block;
+}
+
+.input {
+    border-radius: 25px !important;
+    display: inline-block;
+}
+
+.btn-div {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.icon {
+    color: rgba(0, 0, 0, 0.575);
+}

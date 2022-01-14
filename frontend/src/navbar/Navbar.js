@@ -13,14 +13,13 @@ import { Link, NavLink } from "react-router-dom";
 
 function Navbar({logout}) {
   const { currentUser } = useContext(UserContext);
-  
+  console.log("currentUser", currentUser);
   function loggedIn() {
     return (
       <>
-          <NavLink className="nav-item nav-link" to="/companies">Companies</NavLink>
-          <NavLink className="nav-item nav-link" to="/jobs">Jobs</NavLink>
-          <NavLink className="nave-item nav-link" to="/profile">Profile</NavLink>
-          <Link className="nav-item nav-link" to="/" onClick={logout}>Logout {currentUser.firstName}</Link>
+          <NavLink className="nav-item nav-link link" to="/discover">Discover</NavLink>
+          <NavLink className="nave-item nav-link link" to="/profile">Profile</NavLink>
+          <Link className="nav-item nav-link link" to="/" onClick={logout}>Logout</Link>
       </>
     );
   }

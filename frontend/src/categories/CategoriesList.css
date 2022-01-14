@@ -1,0 +1,11 @@
+.category-col {
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    padding: 0 !important;
+}
+
+.CategoriesList {
+    /* display: grid; */
+    width: 90% !important;
+}

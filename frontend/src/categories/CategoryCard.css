@@ -1,0 +1,26 @@
+.CategoryCard-body {
+    width: 300px;
+    height: 300px;
+    border-radius: 15px;
+    background-image: url("https://wallpaperaccess.com/full/1534541.jpg");
+    background-repeat: no-repeat;
+    background-size: 300px 300px;
+    box-shadow: 5px 5px 10px #252525b6;
+}
+
+.category-link {
+    color: rgba(255, 251, 251, 0.466);
+    text-decoration: none;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.category-link:hover {
+    color: white;
+}
+
+.category-name {
+    position: relative;
+    top: 100px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 60px;
+}

@@ -57,7 +57,6 @@ class User {
 
   static async register(
       { username, password, firstName, lastName, email }) {
-          console.log("inside register function of user class /models/user.js")
     const duplicateCheck = await db.query(
           `SELECT username
            FROM users
@@ -78,7 +77,7 @@ class User {
             first_name,
             last_name,
             email)
-           VALUES ($1, $2, $3, $4, $5, $6)
+           VALUES ($1, $2, $3, $4, $5)
            RETURNING username, first_name AS "firstName", last_name AS "lastName", email`,
         [
           username,

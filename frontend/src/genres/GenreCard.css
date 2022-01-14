@@ -1,0 +1,26 @@
+.GenreCard-body {
+    width: 150px;
+    height: 150px;
+    border-radius: 15px;
+    background-image: url("https://res.allmacwallpaper.com/get/macbook-air-wallpapers/Texture-Black-White-Patterns-Tigers/1119-720.jpg");
+    background-repeat: no-repeat;
+    background-size: 150px 150px;
+    box-shadow: 5px 5px 10px #252525b6;
+}
+
+.genre-link {
+    color: white;
+    text-decoration: none;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.genre-link:hover {
+    color: white;
+}
+
+.genre-name {
+    position: relative;
+    top: 65px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
+}

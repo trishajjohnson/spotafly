@@ -13,8 +13,6 @@ class SpotaflyApi {
   static token;
 
   static async request(endpoint, data = {}, method = "get") {
-    console.log("test");
-    console.log("API Call in request function SpotaflyApi:", endpoint, data, method);
 
     const url = `${BASE_URL}/${endpoint}`;
     let headers;
@@ -23,19 +21,16 @@ class SpotaflyApi {
     } else {
       headers = { Authorization: `Bearer ${SpotaflyApi.token}` };
     }
-    console.log("headers", headers)
     const params = (method === "get")
         ? data
         : {};
 
     try {
-      const result = await axios({ url, data, method, params, headers }).data;
-      console.log("url= ", url, method, data, params)
-      console.log('result in request SpotaflyApi', result)
-      return (result)
+      const result = await axios({ url, data, method, params, headers });
+      return result.data;
     } catch (err) {
-      console.error("API Error inside SpotaflyApi:", err);
-      // console.error("API Error:", err.response);
+      console.log("err in api", err)
+      console.error("API Error:", err);
       let message = err.response.data.error.message;
       throw Array.isArray(message) ? message : [message];
     }
@@ -50,10 +45,30 @@ class SpotaflyApi {
     return res.user;
   }
 
+  // Get New Releases
+
+  static async getNewReleases() {
+    let res = await this.request(`discover/new-releases`);
+    
+    console.log("res in geNewReleases() api.js", res.newReleases)
+    return res.newReleases;
+  }
+  // Get all genres
+
+  static async getGenres() {
+    console.log("inside getGenres() of SpotaflyApi BEFORE calling backend")
+    let res = await this.request(`discover/genres`);
+    console.log("inside getGenres() of SpotaflyApi AFTER calling backend")
+    console.log("res in getGenres() api.js", res)
+    return res;
+  }
+
   /** Get artists (filtered by name if not undefined) */
 
-  static async getArtists(name) {
-    let res = await this.request("artists", { name });
+  static async getArtists(searchTerm) {
+    console.log("inside SpotaflyApi.getArtists BEFORE api call")
+    let res = await this.request("discover/artists", { searchTerm });
+    console.log("inside SpotaflyApi.getArtists AFTER api call")
     return res.artists;
   }
 
@@ -75,18 +90,14 @@ class SpotaflyApi {
 
   static async login(data) {
     let res = await this.request(`auth/token`, data, "post");
-    return res.token;
-  }
+    return res;
+  } 
 
   /** Signup for site. */
 
   static async signup(data) {
-    console.log("data from signup api.js", data)
-    console.log("inside signup function api.js frontend before calling backend route")
     let res = await this.request(`auth/register`, data, 'post');
-    console.log("res inside signup of api.js", res)
-    console.log("inside signup function api.js frontend after calling backend route")
-    return res.token;
+    return res;
   }
 
   /** Save user profile page. */

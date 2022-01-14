@@ -1,0 +1,9 @@
+.loadMore-btn {
+    border: 1px solid black !important;
+    /* border-radius: 25px !important; */
+    text-align: left !important;
+}
+
+.loadMore-btn:hover {
+    background-color: rgba(0, 0, 0, 0.178);   
+}
