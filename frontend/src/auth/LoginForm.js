@@ -38,7 +38,7 @@ function LoginForm({login}) {
         <div className="form-group grp">
           <label className="mt-2" htmlFor="username">Username</label>  
           <input
-            className="form-control input"
+            className="form-control login-input"
             onChange={handleChange}
             type="text"
             name="username"
@@ -49,7 +49,7 @@ function LoginForm({login}) {
         <div className="form-group grp">
           <label className="mt-2" htmlFor="password">Password</label>
           <input
-            className="form-control input"
+            className="form-control login-input"
             onChange={handleChange}
             type="password"
             name="password"

@@ -11,6 +11,7 @@ function SignupForm({signup}) {
     password: "",
     firstName: "",
     lastName: "",
+    imgUrl: "",
     email: "",
   });
   const [formErrors, setFormErrors] = useState([]);
@@ -39,9 +40,9 @@ function SignupForm({signup}) {
       <p className="lead">Already a member? <a className="signup-link" href="/login">Login here</a></p>
       <form className="form" onSubmit={handleSubmit}>
         <div className="form-group grp">
-          <label className="mtb31" htmlFor="username">Username</label>
+          <label className="" htmlFor="username">Username</label>
           <input
-            className="form-control input"
+            className="form-control signup-input"
             onChange={handleChange}
             type="text"
             name="username"
@@ -52,7 +53,7 @@ function SignupForm({signup}) {
         <div className="form-group grp">
           <label className="mt-2" htmlFor="password">Password</label>
           <input
-            className="form-control input"
+            className="form-control signup-input"
             onChange={handleChange}
             type="password"
             name="password"
@@ -63,7 +64,7 @@ function SignupForm({signup}) {
         <div className="form-group grp">
           <label className="mt-3" htmlFor="firstName">First Name</label>
           <input
-            className="form-control input"
+            className="form-control signup-input"
             onChange={handleChange}
             type="firstName"
             name="firstName"
@@ -74,7 +75,7 @@ function SignupForm({signup}) {
         <div className="form-group grp">
           <label className="mt-3" htmlFor="lastName">Last Name</label>
           <input
-            className="form-control input"
+            className="form-control signup-input"
             onChange={handleChange}
             type="lastName"
             name="lastName"
@@ -83,9 +84,20 @@ function SignupForm({signup}) {
           />
         </div>
         <div className="form-group grp">
+          <label className="mt-3" htmlFor="imgUrl">Image Url (optional)</label>
+          <input
+            className="form-control signup-input"
+            onChange={handleChange}
+            type="imgUrl"
+            name="imgUrl"
+            id="imgUrl"
+            value={formData.imgUrl}
+          />
+        </div>
+        <div className="form-group grp">
           <label className="mt-3" htmlFor="email">Email</label>
           <input
-            className="form-control input"
+            className="form-control signup-input"
             onChange={handleChange}
             type="email"
             name="email"

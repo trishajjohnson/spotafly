@@ -4,8 +4,6 @@ import "./SearchForm.css";
 
 function SearchForm({search}) {
     const [searchTerm, setSearchTerm] = useState("");
-
-    //   const [formErrors, setFormErrors] = useState([]);
     
     const handleChange = evt => {
     setSearchTerm(evt.target.value);
@@ -22,7 +20,7 @@ function SearchForm({search}) {
             <form className="form-inline" onSubmit={handleSubmit}>
                 <div className="form-group form-input">
                     <input
-                        className="form-control input"
+                        className="form-control search-input"
                         onChange={handleChange}
                         type="text" 
                         value={searchTerm}

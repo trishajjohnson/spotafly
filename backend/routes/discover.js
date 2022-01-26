@@ -1,6 +1,6 @@
 "use strict";
 
-/** Routes for discover. */
+/** Routes for common discover functions. */
 
 const jsonschema = require("jsonschema");
 
@@ -12,11 +12,24 @@ const musicSearchAuthSchema = require("../schemas/musicSearch.json")
 const router = express.Router();
 
 
+router.get("/paginate", ensureLoggedIn, async function (req, res, next) {
+    
+    try {
+        console.log("inside paginate in discover routes BEFORE calling API");
+        const { url } = req.query;
+        console.log("url in discover routes paginate", url);
+        const result = await Discover.paginate(url);
+        console.log("inside discover/paginate route AFTER calling Discover.paginate()")
+        console.log("result res in discover paginate route", result)
+        return res.json({ result });
+    } catch (err) {
+        return next(err);
+    }
+});
+
 router.get("/genres", ensureLoggedIn, async function (req, res, next) {
     try {
-      console.log("inside discover/genres route BEFORE calling Discover.getGenres()")
       const genres = await Discover.getGenres();
-      console.log("inside discover/genres route AFTER calling Discover.getGenres()")
       return res.json({ genres });
     } catch (err) {
       return next(err);
@@ -25,35 +38,131 @@ router.get("/genres", ensureLoggedIn, async function (req, res, next) {
 
 router.get("/new-releases", ensureLoggedIn, async function (req, res, next) {
     try {
-      console.log("inside discover/genres route BEFORE calling Discover.getGenres()")
       const newReleases = await Discover.getNewReleases();
-      console.log("inside discover/genres route AFTER calling Discover.getGenres()")
       return res.json({ newReleases });
     } catch (err) {
       return next(err);
     }
 });
 
+
+// Discover Artists backend routes
+
 router.get("/artists", ensureLoggedIn, async function (req, res, next) {
-    console.log("inside discover/artists route on backend BEFORE try validators")
-    console.log("req.query", req.query)
-    console.log("req.body", req.body)
+    
     try {
-        const validator = jsonschema.validate(req.body, musicSearchAuthSchema);
+        const { searchTerm, genre } = req.query;
+        const validator = jsonschema.validate(req.query, musicSearchAuthSchema);
         if (!validator.valid) {
           const errs = validator.errors.map(e => e.stack);
           throw new BadRequestError(errs); 
         }
     
-        const { searchTerm } = req.body;
-        console.log("searchTerm inside discover/artists route", searchTerm);
-        console.log("inside discover/artists route BEFORE calling Discover.getArtists()")
-        const artistsByGenre = await Discover.getArtists(searchTerm);
-        console.log("inside discover/artists route AFTER calling Discover.getArtists()")
-        return res.json({ artistsByGenre });
+        const result = await Discover.getArtists(searchTerm, genre);
+        return res.json({ result });
     } catch (err) {
         return next(err);
     }
 });
+
+router.get("/artists/:id", ensureLoggedIn, async function (req, res, next) {
+    
+    try {
+        const { id } = req.query;
+        const artist = await Discover.getArtist(id);
+
+        return res.json({ artist });
+    } catch (err) {
+        return next(err);
+    }
+});
+
+router.get("/artists/:id/albums", ensureLoggedIn, async function (req, res, next) {
+    
+    try {
+        const { id } = req.query;
+        const albums = await Discover.getArtistAlbums(id);
+
+        return res.json({ albums });
+    } catch (err) {
+        return next(err);
+    }
+});
+
+router.get("/artists/:id/top-tracks", ensureLoggedIn, async function (req, res, next) {
+    
+    try {
+        const { id } = req.query;
+        const topTracks = await Discover.getArtistTopTracks(id);
+
+        return res.json({ topTracks });
+    } catch (err) {
+        return next(err);
+    }
+});
+
+
+// Discover Albums backend routes
+
+router.get("/albums", ensureLoggedIn, async function (req, res, next) {
+    
+    try {
+        const { searchTerm } = req.query;
+        const validator = jsonschema.validate(req.query, musicSearchAuthSchema);
+        if (!validator.valid) {
+          const errs = validator.errors.map(e => e.stack);
+          throw new BadRequestError(errs); 
+        }
+    
+        const result = await Discover.getAlbums(searchTerm);
+        return res.json({ result });
+    } catch (err) {
+        return next(err);
+    }
+});
+
+router.get("/albums/:id", ensureLoggedIn, async function (req, res, next) {
+    
+    try {
+        const { id } = req.query;
+        const album = await Discover.getAlbum(id);
+
+        return res.json({ album });
+    } catch (err) {
+        return next(err);
+    }
+});
+
+
+// Discover Songs backend routes
+
+router.get("/songs", ensureLoggedIn, async function (req, res, next) {
+    
+    try {
+        const { searchTerm } = req.query;
+        const validator = jsonschema.validate(req.query, musicSearchAuthSchema);
+        if (!validator.valid) {
+          const errs = validator.errors.map(e => e.stack);
+          throw new BadRequestError(errs); 
+        }
+    
+        const result = await Discover.getSongs(searchTerm);
+        return res.json({ result });
+    } catch (err) {
+        return next(err);
+    }
+});
+
+router.get("/tracks", ensureLoggedIn, async function (req, res, next) {
+    
+    try {
+        const { ids } = req.query;
+        const result = await Discover.getSeveralTracks(ids);
+        return res.json({ result });
+    } catch (err) {
+        return next(err);
+    }
+});
+
 
 module.exports = router;

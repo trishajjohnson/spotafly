@@ -1,0 +1,26 @@
+.updateBtn {
+    border-color: black !important;
+    /* margin: 15px; */
+    text-align: left !important;
+}
+
+.updateBtn:hover {
+    background-color: rgba(0, 0, 0, 0.178);
+}
+
+.update-input {
+    border-radius: 5px;
+}
+
+.form {
+    width: 30%;
+    margin: 0 auto;
+}
+
+.grp {
+    text-align:left !important;
+}
+
+.mr2 {
+    margin-right: 10px;
+}

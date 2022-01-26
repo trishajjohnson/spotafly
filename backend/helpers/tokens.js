@@ -27,7 +27,7 @@ async function createToken(user) {
   // process.env.REFRESH_ACCESS_TOKEN = token.data.refresh_token;
   let payload = {
     username: user.username,
-    access_token: token.data.access_token,
+    // access_token: token.data.access_token,
   };
   
   return jwt.sign(payload, SECRET_KEY);

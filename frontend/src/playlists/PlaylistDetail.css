@@ -1,0 +1,29 @@
+.hr {
+    width: 75%;
+    margin: 0 auto;
+}
+
+.PlaylistDetail-img {
+    width: 300px;
+    box-shadow: 5px 5px 10px #252525b6;
+}
+
+.remove {
+    margin-left: 10px;
+    color: rgba(0, 0, 0, 0.383);
+}
+
+.remove:hover {
+    color: rgba(0, 0, 0, 0.726);
+}
+
+.delete-btn {
+    background: none !important;
+    color: black !important;
+    border-color: black !important;
+    text-align: left !important;
+}
+
+.delete-btn:hover {
+    background-color: rgba(0, 0, 0, 0.178) !important;
+}

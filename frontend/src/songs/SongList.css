@@ -1,0 +1,12 @@
+.song-col {
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    padding: 0 !important;
+}
+
+.SongList {
+    /* display: grid; */
+    width: 70% !important;
+    margin: 0 auto;
+}

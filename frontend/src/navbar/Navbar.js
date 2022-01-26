@@ -18,7 +18,7 @@ function Navbar({logout}) {
     return (
       <>
           <NavLink className="nav-item nav-link link" to="/discover">Discover</NavLink>
-          <NavLink className="nave-item nav-link link" to="/profile">Profile</NavLink>
+          <NavLink className="nave-item nav-link link" to={`/profile/${currentUser.username}`}>Profile</NavLink>
           <Link className="nav-item nav-link link" to="/" onClick={logout}>Logout</Link>
       </>
     );

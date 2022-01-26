@@ -3,6 +3,7 @@ import { Redirect, useParams } from "react-router-dom";
 import UserContext from "../auth/UserContext";
 import SpotaflyApi from "../api/api";
 import ArtistList from "../artists/ArtistList";
+import AlbumList from "../albums/AlbumList";
 import LoadingSpinner from "../common/LoadingSpinner";
 import SearchForm from "../discover/SearchForm";
 import "./GenreSearch.css";
@@ -11,51 +12,34 @@ import "./GenreSearch.css";
 
 function GenreSearch() {
     const genre = useParams().genre;
+    const genreName = `${genre[0].toUpperCase()}${genre.slice(1)}`
     console.log("genre", genre);
     const { currentUser } = useContext(UserContext);
     const [artists, setArtists] = useState(null);
-    const [newReleases, setNewReleases] = useState(null);
     const [searchComplete, setSearchComplete] = useState(false);
 
-    useEffect(function loadNewReleases() {
-        async function getNewReleases() {
-            try {
-                console.log("inside useEffect of GenreSearch.js before SpotaflyApi call")
-                const newArtistReleases = await SpotaflyApi.getNewReleases();
-                setNewReleases(newArtistReleases);
-                console.log("newReleases after SpotaflyApi call inside useEffect GenreSearch.js", newReleases)
-            } catch(e) {
-                console.log(e);
-            }
-        }
-        getNewReleases();
-    }, [genre]);
-
     async function search(searchTerm) {
-        let res = await SpotaflyApi.getArtists(searchTerm);
+        setSearchComplete(false);
+        let res = await SpotaflyApi.getArtists(searchTerm, genre);
         console.log("searching...");
-        console.log("result from search function in GenreSearch.js", res);
-        setArtists(res);
+        console.log("result from search function in GenreSearch.js", res.result);
+        setArtists(res.result);
+        console.log("artist search result in search function of genreSearch", artists)
+        setSearchComplete(true);
     }
 
-    function showNewReleases() {
-        const sample = newReleases.items.slice(0,18);
-        sample.map(r => console.log("new release", r))
-
-        return (
-            <div>
-                <ArtistList newReleases={sample} />
-                {/* <button className="btn loadMore-btn" onClick={() => setShowListPreview(false)}>Load more</button> */}
-            </div>
-        )
-    } 
+    async function paginate(url) {
+        let res = await SpotaflyApi.paginate(url);
+        setArtists(res.result);
+        setSearchComplete(true);
+    }
 
     function showArtists() {
-        
+        console.log("artists in show artists", artists)
         return (
             <div>
-                <ArtistList genres={artists.artists} />
-                {/* <button className="btn loadMore-btn" onClick={() => setShowListPreview(true)}>Show less</button> */}
+                <p className="lead numResults">Results {Number(artists.artists.offset)+1}-{Number(artists.artists.offset)+artists.artists.items.length} of {artists.artists.total}</p>
+                <ArtistList artists={artists} paginate={paginate} />
             </div>
         )
     }
@@ -64,17 +48,16 @@ function GenreSearch() {
         return <Redirect to="/login" />
     }
 
-    if(!newReleases) return <LoadingSpinner />
-
 
     return (
         
-        <div className="GenreSearch">
-            <h1 className="m-5">
-                Artists in {genre}
+        <div className="GenreSearch mb-5">
+            <h1 className="mt-3 mb-5">
+                Search Artists in {genreName} Genre
             </h1>
             <SearchForm search={search} />
-            {searchComplete ? showArtists(): showNewReleases()}
+            
+            {searchComplete ? showArtists(): <></>}
                 
         </div>         
         

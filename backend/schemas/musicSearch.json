@@ -6,9 +6,12 @@
       "searchTerm": {
         "type": "string",
         "minLength": 1
+      },
+      "genre": {
+        "type": "string"
       }
     },
     "additionalProperties": false,
-    "required": []
+    "required": ["searchTerm"]
   }
   

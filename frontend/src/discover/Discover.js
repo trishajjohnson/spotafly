@@ -18,7 +18,7 @@ function Discover() {
         
         <div className="Discover">
             <div className="Discover-genre-list">
-                <h1 className="genre-section-header m-5">
+                <h1 className="genre-section-header mt-3 mb-5">
                     Browse by Category
                 </h1>
                 <CategoriesList categories={categories} />                            

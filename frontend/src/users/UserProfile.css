@@ -1,0 +1,59 @@
+.UserProfile-img {
+    width: 300px;
+    box-shadow: 5px 5px 10px #252525b6;
+}
+
+.UserProfile-btn {
+    border-color: black !important;
+    text-align: left !important;
+}
+
+.UserProfile-btn:hover {
+    background-color: rgba(0, 0, 0, 0.178);
+}
+
+.add-btn {
+    background: none !important;
+    color: black !important;
+    border-color: black !important;
+    text-align: left !important;
+}
+
+.add-btn:hover {
+    background-color: rgba(0, 0, 0, 0.178) !important;
+    /* color: rgba(255, 255, 255, 0.719) !important; */
+}
+
+.playlist-btn {
+    background: none !important;
+    color: rgba(255, 255, 255, 0.719) !important;
+    border-color: rgba(255, 255, 255, 0.411) !important;
+    text-align: left !important;
+}
+
+.playlist-btn:hover {
+    background-color: rgba(0, 0, 0, 0.178) !important;
+    color: rgba(255, 255, 255, 0.719) !important;
+}
+
+.my-modal .modal-content {
+    background-color: rgb(31, 30, 30) !important;
+    color: rgba(255, 255, 255, 0.719);
+    width: 450px;
+}
+
+.input {
+    border: 1px solid rgba(255, 255, 255, 0.411) !important;
+    border-radius: 3px !important;
+    background-color: rgba(255, 254, 254, 0.815) !important;
+    /* color: rgba(255, 255, 255, 0.719) !important; */
+}
+
+.cancel {
+    margin-right: 5px;
+    /* text-align: end; */
+}
+
+.btns {
+    text-align: end;
+}

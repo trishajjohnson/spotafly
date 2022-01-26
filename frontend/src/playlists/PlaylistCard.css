@@ -1,0 +1,40 @@
+.PlaylistCard {
+    background-color: rgb(29, 28, 28) !important;
+    border-radius: 5px !important;
+    height: 200px;
+    width: 200px;
+    box-shadow: 5px 5px 10px #252525b6;
+}
+
+.PlaylistCard:hover {
+    background-color: rgb(22, 22, 22) !important;
+    border-radius: 5%;
+}
+
+.playlist-link {
+    text-decoration: none;
+    color: white;
+}
+
+.playlist-link:hover {
+    text-decoration: none;
+    color: white;
+}
+
+.card-text {
+    color: grey;
+}
+
+.playlist-img {
+    width: 125px !important;
+    height: 125px !important;
+    padding-top: 20px;
+}
+
+.playlist-type {
+    margin-bottom: 4px !important;
+}
+
+.playlist-name {
+    margin-bottom: 0 !important;
+}

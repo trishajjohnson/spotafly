@@ -1,6 +1,6 @@
 .searchForm-btn {
     border: 1px solid black !important;
-    border-radius: 25px !important;
+    border-radius: 5px !important;
     text-align: left !important;
 }
 
@@ -14,8 +14,8 @@
     display: inline-block;
 }
 
-.input {
-    border-radius: 25px !important;
+.search-input {
+    border-radius: 5px !important;
     display: inline-block;
 }
 
@@ -25,5 +25,5 @@
 }
 
 .icon {
-    color: rgba(0, 0, 0, 0.575);
+    color: rgba(0, 0, 0);
 }

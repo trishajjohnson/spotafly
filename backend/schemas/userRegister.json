@@ -23,6 +23,9 @@
         "minLength": 1,
         "maxLength": 30
       },
+      "imgUrl": {
+        "type": "string"
+      },
       "email": {
         "type": "string",
         "minLength": 6,

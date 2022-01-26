@@ -56,7 +56,7 @@ class User {
    **/
 
   static async register(
-      { username, password, firstName, lastName, email }) {
+      { username, password, firstName, lastName, imgUrl, email }) {
     const duplicateCheck = await db.query(
           `SELECT username
            FROM users
@@ -69,6 +69,13 @@ class User {
     }
 
     const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
+    let profileUrl;
+    
+    if(imgUrl === "") {
+      profileUrl = "https://i.pinimg.com/474x/65/25/a0/6525a08f1df98a2e3a545fe2ace4be47.jpg";
+    } else {
+      profileUrl = imgUrl;
+    }
 
     const result = await db.query(
           `INSERT INTO users
@@ -76,17 +83,24 @@ class User {
             password,
             first_name,
             last_name,
+            img_url,
             email)
-           VALUES ($1, $2, $3, $4, $5)
-           RETURNING username, first_name AS "firstName", last_name AS "lastName", email`,
+           VALUES ($1, $2, $3, $4, $5, $6)
+           RETURNING username, first_name AS "firstName", last_name AS "lastName", img_url as "imgUrl", email`,
         [
           username,
           hashedPassword,
           firstName,
           lastName,
+          profileUrl,
           email
         ],
     );
+    
+    const favorites = await db.query(
+      `INSERT INTO playlists (playlist_name, img_url, username)
+       VALUES ($1, $2, $3)`,
+    ["Favorite Songs", "https://ak.picdn.net/shutterstock/videos/3361085/thumb/1.jpg", username]);
 
     const user = result.rows[0];
 
@@ -107,6 +121,7 @@ class User {
           `SELECT username,
                   first_name AS "firstName",
                   last_name AS "lastName",
+                  img_url AS "imgUrl",
                   email
            FROM users
            WHERE username = $1`,
@@ -117,12 +132,28 @@ class User {
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
 
-    // const userSongFavoritesRes = await db.query(
-    //       `SELECT s.id, s.song_title, s.album_title, s.artist_name
-    //        FROM favorite_songs AS s
-    //        WHERE s.user_id = $1`, [username]);
+    const favoritePlaylist = await db.query(
+      `SELECT p.playlist_id
+       FROM playlists AS p
+       WHERE p.username = $1 AND p.playlist_name = $2`, 
+      [username, "Favorite Songs"]);
+    console.log("favoritePlaylist", favoritePlaylist);
 
-    // user.favorite_songs = userSongFavoritesRes.rows.map(s => s.id);
+    const favoriteSongs = await db.query(
+      `SELECT s.song_id
+       FROM songs_playlists AS s
+       WHERE s.playlist_id = $1`, 
+      [favoritePlaylist.rows[0].playlist_id]);
+
+    console.log("favoriteSongs in get user model upon login", favoriteSongs);
+    user.favoriteSongs = favoriteSongs.rows.map(s => s.song_id);
+    console.log("user.favoriteSongs in backend user model", user.favoriteSongs);
+    const userPlaylistsRes = await db.query(
+          `SELECT p.playlist_id, p.playlist_name, p.img_url
+           FROM playlists AS p
+           WHERE p.username = $1`, [username]);
+
+    user.playlists = userPlaylistsRes.rows.map(p => p);
 
     // const userFollowedArtistsRes = await db.query(
     //       `SELECT a.artist_id, a.artist_name
@@ -186,26 +217,174 @@ class User {
    **/
 
   static async addSongToFavorites(username, songId) {
-    const preCheck = await db.query(
-          `SELECT song_id
-           FROM favorite_songs
-           WHERE user_id = $1 AND song_id = $2`, [username, songId]);
-    const song = preCheck.rows[0];
-
-    if (!song) throw new NotFoundError(`No song: ${songId}`);
-
     const preCheck2 = await db.query(
           `SELECT username
            FROM users
            WHERE username = $1`, [username]);
+
     const user = preCheck2.rows[0];
 
     if (!user) throw new NotFoundError(`No username: ${username}`);
 
+    const favoritesPlaylist = await db.query(
+      `SELECT playlist_id
+       FROM playlists
+       WHERE playlist_name = $1 AND username = $2`, 
+      ["Favorite Songs", username]);
+
+    const preCheck = await db.query(
+          `SELECT song_id
+           FROM songs_playlists
+           WHERE playlist_id = $1 AND song_id = $2`, 
+          [favoritesPlaylist.rows[0].playlist_id, songId]);
+
+    const song = preCheck.rows[0];
+
+    if (song) throw new NotFoundError(`Song already in favorites: ${songId}`);
+
     await db.query(
-          `INSERT INTO favorite_songs (song_id, username)
+          `INSERT INTO songs_playlists (song_id, playlist_id)
            VALUES ($1, $2)`,
-        [songId, username]);
+        [songId, favoritesPlaylist.rows[0].playlist_id]);
+  }
+
+  static async removeSongFromFavorites(username, songId) {
+    const preCheck2 = await db.query(
+      `SELECT username
+       FROM users
+       WHERE username = $1`, [username]);
+
+    const user = preCheck2.rows[0];
+
+    if (!user) throw new NotFoundError(`No username: ${username}`);
+
+    const favoritesPlaylist = await db.query(
+      `SELECT playlist_id
+       FROM playlists
+       WHERE playlist_name = $1 AND username = $2`, 
+      ["Favorite Songs", username]);
+
+    let result = await db.query(
+        `DELETE
+        FROM songs_playlists
+        WHERE playlist_id = $1 AND song_id = $2
+        RETURNING song_id`,
+      [favoritesPlaylist.rows[0].playlist_id, songId],
+    );
+
+    const song = result.rows[0];
+
+    if (!song) throw new NotFoundError(`No song: ${songId}`);
+  }
+
+  static async createNewPlaylist(playlist_name, img_url, username) {
+    let result;
+    if(img_url !== "") {
+      result = await db.query(
+            `INSERT INTO playlists (playlist_name, img_url, username)
+             VALUES ($1, $2, $3)
+             RETURNING playlist_id, playlist_name, img_url`,
+          [playlist_name, img_url, username]);
+    } else {
+      const default_img = "https://us.123rf.com/450wm/soloviivka/soloviivka1606/soloviivka160600001/59688426-music-note-vector-icon-white-on-black-background.jpg?ver=6";
+      result = await db.query(
+        `INSERT INTO playlists (playlist_name, img_url, username)
+         VALUES ($1, $2, $3)
+         RETURNING playlist_id, playlist_name, img_url`,
+      [playlist_name, default_img, username]);
+    }
+
+    const playlist = result.rows[0];
+    console.log("playlist in user model", playlist);
+    if (!playlist) throw new BadRequestError(`Playlist not added`);
+
+    return playlist;
+  }
+
+  static async removePlaylist(playlistId) {
+    const result = await db.query(
+      `DELETE 
+       FROM playlists
+       WHERE playlist_id = $1
+       RETURNING playlist_id`, 
+      [playlistId]);
+
+    const playlist = result.rows[0];
+
+    if (!playlist) throw new NotFoundError(`No playlist: ${playlistId}`);
+
+    return playlist;
+  }
+
+  static async addSongToPlaylist(playlistId, songId) {
+    const result = await db.query(
+      `SELECT playlist_id
+       FROM playlists
+       WHERE playlist_id = $1`, 
+      [playlistId]);
+    
+    const playlist = result.rows[0];
+
+    if(!playlist) throw new NotFoundError(`No playlist found: ${playlistId}`);
+      console.log("songId in addSongToPlaylist user model", songId);
+    const preCheck = await db.query(
+          `SELECT song_id
+           FROM songs_playlists
+           WHERE playlist_id = $1 AND song_id = $2`, 
+          [playlistId, songId]);
+
+    const song = preCheck.rows[0];
+
+    if (song) throw new NotFoundError(`Song already in playlist: ${songId}`);
+
+    await db.query(
+          `INSERT INTO songs_playlists (song_id, playlist_id)
+           VALUES ($1, $2)`,
+        [songId, playlistId]);
+  }
+
+  static async removeSongFromPlaylist(songId, playlistId) {
+    let result = await db.query(
+      `DELETE
+      FROM songs_playlists
+      WHERE playlist_id = $1 AND song_id = $2
+      RETURNING song_id`,
+    [playlistId, songId],
+  );
+
+  const song = result.rows[0];
+
+  if (!song) throw new NotFoundError(`No song: ${songId}`);
+
+  return song;
+}
+
+
+  static async getPlaylist(id, username) {
+    const playlistRes = await db.query(
+          `SELECT playlist_id,
+                  playlist_name,
+                  img_url,
+                  username
+            FROM playlists
+            WHERE playlist_id = $1`,
+        [id],
+    );
+
+    const playlist = playlistRes.rows[0];
+
+    if (!playlist) throw new NotFoundError(`No playlist: ${id}`);
+    
+    const playlistSongsRes = await db.query(
+          `SELECT p.song_id
+            FROM songs_playlists AS p
+            WHERE p.playlist_id = $1`, [id]
+    );
+            
+    playlist.tracks = playlistSongsRes.rows.map(t => t.song_id);
+
+    console.log("playlist in getPlaylist user model", playlist);
+    return playlist;
   }
 
 

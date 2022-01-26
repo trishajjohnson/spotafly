@@ -1,0 +1,32 @@
+.ArtistCard {
+    background-color: rgb(29, 28, 28) !important;
+    border-radius: 5px !important;
+    height: 250px;
+    width: 200px;
+    box-shadow: 5px 5px 10px #252525b6;
+}
+
+.ArtistCard:hover {
+    background-color: rgb(22, 22, 22) !important;
+    border-radius: 5%;
+}
+
+.artist-link {
+    text-decoration: none;
+    color: white;
+}
+
+.artist-link:hover {
+    text-decoration: none;
+    color: white;
+}
+
+.card-text {
+    color: grey;
+}
+
+.artist-img {
+    width: 150px !important;
+    height: 150px !important;
+    padding-top: 20px;
+}

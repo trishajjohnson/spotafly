@@ -1,0 +1,57 @@
+.AlbumDetail-img {
+    width: 300px;
+    box-shadow: 5px 5px 10px #252525b6;
+}
+ 
+.track-row {
+    border-top: rgba(0, 0, 0, 0.301);
+    border-bottom: rgba(0, 0, 0, 0.301);
+}
+
+.table-width {
+    width: 75% !important;
+    margin: 0 auto;
+}
+
+.text-align {
+    text-align: left;
+}
+
+.fav {
+    margin-right: 10px;
+    color:rgb(143, 29, 29);
+}
+
+.add-fav {
+    margin-right: 10px;
+    color:rgba(0, 0, 0, 0.301);
+}
+
+.add-fav:hover {
+    color:rgba(0, 0, 0);
+}
+
+.add-dropdown {
+    margin-left: 10px;
+    color:rgba(0, 0, 0, 0.301);
+}
+
+.add-dropdown:hover {
+    color:rgba(0, 0, 0);
+}
+
+.dropdown-btn {
+    display: inline-block;
+
+}
+
+.drop-btn {
+    margin-left: 15px;
+    background: none !important;
+    color: inherit !important;
+	border: none !important;
+	padding: 0 !important;
+	font: inherit !important;
+	cursor: pointer !important;
+	outline: inherit !important;
+}

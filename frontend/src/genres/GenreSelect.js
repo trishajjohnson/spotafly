@@ -60,7 +60,7 @@ function GenreSelect() {
         
         <div className="GenreSearch">
             
-            <h1 className="m-5">
+            <h1 className="mt-3 mb-5">
                 Browse by Genre
             </h1>
             {showGenrePreview ? showSampleGenres(): showGenres()}

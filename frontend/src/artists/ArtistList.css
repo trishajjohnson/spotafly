@@ -1,0 +1,32 @@
+.artist-col {
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    padding: 0 !important;
+}
+
+.ArtistList {
+    /* display: grid; */
+    width: 70% !important;
+    margin: 0 auto;
+}
+
+.pg-style {
+    /* margin-left: 15px; */
+    background: none !important;
+    color: inherit !important;
+	border: 1px solid black !important;
+	/* padding: 3px !important; */
+	font: inherit !important;
+	cursor: pointer !important;
+	outline: inherit !important;
+}
+
+.pg-style:hover {
+    background-color: rgba(0, 0, 0, 0.178) !important;   
+}
+
+.numResults {
+    text-align: left;
+    padding-left: 15px;
+}

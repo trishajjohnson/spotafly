@@ -1,0 +1,39 @@
+.AlbumCard {
+    background-color: rgb(29, 28, 28) !important;
+    border-radius: 5px !important;
+    height: 340px;
+    width: 200px;
+    box-shadow: 5px 5px 10px #252525b6;
+}
+
+.AlbumCard:hover {
+    background-color: rgb(22, 22, 22) !important;
+    border-radius: 5%;
+}
+
+.album-link {
+    text-decoration: none;
+    color: white;
+}
+
+.album-link:hover {
+    text-decoration: none;
+    color: white;
+}
+
+.card-text {
+    color: grey;
+}
+
+.album-img {
+    width: 150px !important;
+    padding-top: 20px;
+}
+
+.album-type {
+    margin-bottom: 4px !important;
+}
+
+.album-name {
+    margin-bottom: 0 !important;
+}

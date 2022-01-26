@@ -14,8 +14,6 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const initialVal = localStorage.getItem(STORE_TOKEN_ID) || null;
   const [token, setToken] = useState(initialVal);
-  // const [followedArtistIds, setFollowedArtistIds] = useState(new Set([]));
-  // const [favoriteSongIds, setFavoriteSongIds] = useState(new Set([]));
 
   useEffect(function loadUserInfo() {
     async function getCurrentUser() {
@@ -25,8 +23,6 @@ function App() {
           SpotaflyApi.token = token;
           let currUser = await SpotaflyApi.getCurrentUser(username);
           setCurrentUser(currUser);
-          // setFavoriteSongIds(new Set(currentUser.favoriteSongs));
-          // setFollowedArtistIds(new Set(currentUser.followedArtists));
         } catch(e) {
           console.log(e);
           setCurrentUser(null);
@@ -41,7 +37,6 @@ function App() {
   async function login(loginData) {
     try {
       let token = await SpotaflyApi.login(loginData);
-      console.log("token in login of App.js", token.token)
       localStorage.setItem(STORE_TOKEN_ID, token.token);
       setToken(localStorage.getItem(STORE_TOKEN_ID));
       return { success: true };
@@ -68,12 +63,64 @@ function App() {
     setToken(null);
   }
 
+  async function addToFavorites(songId) {
+    try {
+      await SpotaflyApi.addToFavorites(songId, currentUser.username);
+    
+      return { success: true };
+    } catch(e) {
+      console.log("Errors: ", e);
+    }
+  }
+
+  async function removeFromFavorites(songId) {
+    try {
+      await SpotaflyApi.removeFromFavorites(songId, currentUser.username);
+    
+      return { success: true };
+    } catch(e) {
+      console.log("Errors: ", e);
+    }
+  }
+
+  async function addToPlaylist(songId, playlistId) {
+    console.log("songId in App.js addToPlaylist", songId);
+    try {
+      await SpotaflyApi.addToPlaylist(songId, playlistId, currentUser.username);
+    
+      return { success: true };
+    } catch(e) {
+      console.log("Errors: ", e);
+    }
+  }
+
+  async function removeFromPlaylist(songId, playlistId) {
+    try {
+      await SpotaflyApi.removeFromPlaylist(songId, playlistId, currentUser.username);
+    
+      return { success: true };
+    } catch(e) {
+      console.log("Errors: ", e);
+    }
+  }
+
+  async function deletePlaylist(playlistId) {
+    try {
+      await SpotaflyApi.deletePlaylist(playlistId, currentUser.username);
+    
+      return { success: true };
+    } catch(e) {
+      console.log("Errors: ", e);
+    }
+  }
+
+
   if(!infoLoaded) return <LoadingSpinner />;
 
 
   return (
     <UserContext.Provider
-            value={{ currentUser, setCurrentUser }}>
+            value={{ currentUser, setCurrentUser, addToFavorites, removeFromFavorites, addToPlaylist, removeFromPlaylist, deletePlaylist }}>
       <div className="App">
           <Navbar logout={logout} />
           <Routes login={login} signup={signup} />

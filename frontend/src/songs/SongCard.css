@@ -1,0 +1,39 @@
+.SongCard {
+    background-color: rgb(29, 28, 28) !important;
+    border-radius: 5px !important;
+    height: 340px;
+    width: 200px;
+    box-shadow: 5px 5px 10px #252525b6;
+}
+
+.SongCard:hover {
+    background-color: rgb(22, 22, 22) !important;
+    border-radius: 5%;
+}
+
+.song-link {
+    text-decoration: none;
+    color: white;
+}
+
+.song-link:hover {
+    text-decoration: none;
+    color: white;
+}
+
+.card-text {
+    color: grey;
+}
+
+.song-img {
+    width: 150px !important;
+    padding-top: 20px;
+}
+
+.song-type {
+    margin-bottom: 4px !important;
+}
+
+.song-name {
+    margin-bottom: 0 !important;
+}
