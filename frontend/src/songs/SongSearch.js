@@ -2,13 +2,18 @@ import React, { useState, useContext } from "react";
 import { Redirect } from "react-router-dom";
 import UserContext from "../auth/UserContext";
 import SpotaflyApi from "../api/api";
-// import ArtistList from "../artists/ArtistList";
 import SongList from "../songs/SongList";
-import LoadingSpinner from "../common/LoadingSpinner";
 import SearchForm from "../discover/SearchForm";
 import "./SongSearch.css";
 
-
+/** Song Search page.
+ *
+ * Renders SearchForm and displays search results.
+ *
+ * Routed at /discover/songs
+ *
+ * Routes -> SongSearch -> SongList
+ */
 
 function SongSearch() {
     const { currentUser } = useContext(UserContext);
@@ -18,16 +23,13 @@ function SongSearch() {
     async function search(searchTerm) {
         setSearchComplete(false);
         let res = await SpotaflyApi.getSongs(searchTerm);
-        console.log("searching...");
         setSongs(res.tracks);
         setSearchComplete(true);
     }
 
     async function paginate(url) {
-        // setSearchComplete(false);
         let res = await SpotaflyApi.paginate(url);
-        console.log("res in paginate SongSearch", res);
-        setSongs(res);
+        setSongs(res.result.tracks);
         setSearchComplete(true);
     }
  
@@ -35,20 +37,19 @@ function SongSearch() {
     function showSongs() {
         if(songs.items.length) {
             return (
-                <div>
+                <div className="mt-5">
                     <p className="lead numResults">Results {Number(songs.offset)+1}-{Number(songs.offset)+songs.items.length} of {songs.total}</p>
                     <SongList songs={songs} paginate={paginate} />
                 </div>
-            )
+            );
         } else {
             return (
-                <p className="lead">There are no results.</p>
-            )
+                <p className="lead mt-5">There are no results.</p>
+            );
         }
     }
 
     if (!currentUser) return <Redirect to="/login" />
-
 
     return (
         

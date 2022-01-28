@@ -8,6 +8,16 @@ import { Redirect } from "react-router-dom";
 import AlbumList from "../albums/AlbumList";
 import './ArtistProfile.css';
 
+/** Artist Profile page.
+ *
+ * Renders information about artist, along with their top 10 songs
+ * and albums.
+ *
+ * Routed at /artists/:id
+ *
+ * Routes -> ArtistProfile -> AlbumList
+ */
+
 function ArtistProfile() {
     const { currentUser, addToFavorites, removeFromFavorites, addToPlaylist } = useContext(UserContext);
     const [artist, setArtist] = useState(null);
@@ -31,7 +41,6 @@ function ArtistProfile() {
     useEffect(() => {
         async function getArtistDetails() {
             let res = await SpotaflyApi.getArtist(id);
-            console.log("res", res);
             setArtist(res);
         }
         getArtistDetails();
@@ -39,10 +48,8 @@ function ArtistProfile() {
 
     useEffect(() => {
         async function getArtistTopSongsAndAlbums() {
-            console.log("before AJAX call inside 2nd useEffect of ArtistProfile");
             const topSongs = await SpotaflyApi.getArtistTopSongs(id);
             const albums = await SpotaflyApi.getArtistAlbums(id);
-            console.log("albums", albums);
             setTopSongs(topSongs.tracks);
             setAlbums(albums);
             setInfoLoaded(true);
@@ -72,7 +79,6 @@ function ArtistProfile() {
     async function paginate(url) {
         setInfoLoaded(false);
         let res = await SpotaflyApi.paginate(url);
-        console.log("res in paginate", res);
         setAlbums(res.result);
         setInfoLoaded(true);
     }
@@ -91,8 +97,8 @@ function ArtistProfile() {
     async function createNewAndAddToPlaylist(evt) {
         const newPlaylist = await SpotaflyApi.createPlaylist(formData);
         const addSong = await addToPlaylist(songIdToAdd, newPlaylist.playlist_id);
-        console.log("addSong in AlbumDetail", addSong);
         setPlaylists([...playlists, newPlaylist]);
+        currentUser.playlists = [...playlists, newPlaylist];
         setFormData({
             playlist_name: "",
             img_url: "",
@@ -106,10 +112,6 @@ function ArtistProfile() {
         for(let i=0; i<tracks.length; i++) {
             rows.push(createRow(tracks[i], i+1));
         }
-        // const rows = tracks.map((i,t) => {
-        //     createRow(t, i);
-        //     i++;
-        // });
 
         return rows;
     }
@@ -121,33 +123,33 @@ function ArtistProfile() {
         const trackTime = `${mins}:${(secs < 10 ? '0' : '') + secs} `;
 
         return (
-                <tr className="track-row">
-                    <th scope="row">{trackNum}</th>
-                    <td className="text-align">{track.name}</td>
-                    <td>
-                        {favoriteSongs.includes(track.id) ?
-                            (
-                                <i onClick={handleHeartClick} id={track.id} className="fas fa-heart fav"></i>
-                            ) : 
-                            (
-                                <i onClick={handleHeartClick} id={track.id} className="far fa-heart add-fav"></i>
-                            )
-                        }
-                        {trackTime}
-                        <Dropdown className="dropdown-btn">
-                            <Dropdown.Toggle className="drop-btn" id="dropdown-basic">
-                            </Dropdown.Toggle>
+            <tr className="track-row">
+                <th scope="row">{trackNum}</th>
+                <td className="text-align">{track.name}</td>
+                <td>
+                    {favoriteSongs.includes(track.id) ?
+                        (
+                            <i onClick={handleHeartClick} id={track.id} className="fas fa-heart fav"></i>
+                        ) : 
+                        (
+                            <i onClick={handleHeartClick} id={track.id} className="far fa-heart add-fav"></i>
+                        )
+                    }
+                    {trackTime}
+                    <Dropdown className="dropdown-btn">
+                        <Dropdown.Toggle className="drop-btn" id="dropdown-basic">
+                        </Dropdown.Toggle>
 
-                            <Dropdown.Menu variant="dark">
-                                <Dropdown.Item onClick={handleCreateNew} data-songid={track.id} href="JavaScript:void(0);">Add to new playlist</Dropdown.Item>
-                                <Dropdown.Divider />
-                                {playlists.map(p => (
-                                    <Dropdown.Item data-songid={track.id} data-playlistid={p.playlist_id} onClick={handleAddClick} href="JavaScript:void(0);">{p.playlist_name}</Dropdown.Item>
-                                ))}                            
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    </td>
-                </tr>
+                        <Dropdown.Menu variant="dark">
+                            <Dropdown.Item onClick={handleCreateNew} data-songid={track.id} href="JavaScript:void(0);">Add to new playlist</Dropdown.Item>
+                            <Dropdown.Divider />
+                            {playlists.map(p => (
+                                <Dropdown.Item data-songid={track.id} data-playlistid={p.playlist_id} onClick={handleAddClick} href="JavaScript:void(0);">{p.playlist_name}</Dropdown.Item>
+                            ))}                            
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </td>
+            </tr>
         );
     }
 
@@ -157,19 +159,17 @@ function ArtistProfile() {
                 <>
                     <AlbumList albums={albums} paginate={paginate} />
                 </>
-            )
+            );
         } else {
             return (
                 <p className="lead">There are no results.</p>
-            )
+            );
         }
     }
 
     if(!artist) return <LoadingSpinner />;
 
-    if (!currentUser) {
-        return <Redirect to="/login" />
-    }
+    if (!currentUser) return <Redirect to="/login" />
 
     return (
 

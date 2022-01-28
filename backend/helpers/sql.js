@@ -12,24 +12,32 @@ const { BadRequestError } = require("../expressError");
  *
  * @returns {Object} {sqlSetCols, dataToUpdate}
  *
- * @example {firstName: 'Aliya', age: 32} =>
- *   { setCols: '"first_name"=$1, "age"=$2',
- *     values: ['Aliya', 32] }
+ * @example {firstName: 'Aliya'} =>
+ *   { setCols: '"first_name"=$1',
+ *     values: ['Aliya'] }
  */
 
 function sqlForPartialUpdate(dataToUpdate, jsToSql) {
-  const keys = Object.keys(dataToUpdate);
+  let keys = Object.keys(dataToUpdate);
   if (keys.length === 0) throw new BadRequestError("No data");
+  keys = keys.filter(k => k !== "password");
 
-  // {firstName: 'Aliya', age: 32} => ['"first_name"=$1', '"age"=$2']
   const cols = keys.map((colName, idx) =>
       `"${jsToSql[colName] || colName}"=$${idx + 1}`,
   );
-
-  return {
-    setCols: cols.join(", "),
-    values: Object.values(dataToUpdate),
-  };
+  let imgUrl = dataToUpdate["img_url"];
+  
+  if(!imgUrl) {
+    return {
+      setCols: `${cols.join(", ")}, "img_url"=$${keys.length + 1}`,
+      values: [...Object.values(dataToUpdate).filter(v => v !== dataToUpdate["password"]), "https://i.pinimg.com/474x/65/25/a0/6525a08f1df98a2e3a545fe2ace4be47.jpg"]
+    }
+  } else {
+    return {
+      setCols: cols.join(", "),
+      values: Object.values(dataToUpdate).filter(v => v !== dataToUpdate["password"])
+    }
+  }
 }
 
 module.exports = { sqlForPartialUpdate };

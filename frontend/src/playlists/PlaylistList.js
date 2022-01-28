@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import PlaylistCard from "./PlaylistCard";
 import "./PlaylistList.css";
 
+/** Displays list of playlistCard elements on user profile page.
+ *
+ * This is routed to at /users/:username
+ *
+ * Routes -> UserProfile -> PlaylistList -> PlaylistCard
+ */
+
 function PlaylistList({playlists}) {
-    console.log("playlists passed to PlaylistList", playlists);
-    // const numPages = Math.ceil(albums.total / 20);
-    // console.log("numPages", numPages)
-    // const [pages, setPages] = useState(Array.from({length: numPages}, (_, i) => i + 1));
 
     return (
         
@@ -18,49 +21,6 @@ function PlaylistList({playlists}) {
                     </div>
                 ))}
             </div>
-            {/* <nav aria-label="Page navigation example mt-3">
-                <ul className="pagination pagination-sm justify-content-center">
-                    {albums.previous ? 
-                        <li className="page-item">
-                            <a 
-                                className="page-link pg-style" 
-                                href="JavaScript:void(0);" 
-                                tabIndex="-1" 
-                                onClick={() => paginate(albums.previous)}>
-                                    Previous
-                            </a>
-                        </li>
-                        :
-                        <li className="page-item disabled">
-                            <a className="page-link pg-style" href="JavaScript:void(0);" tabIndex="-1">Previous</a>
-                        </li>
-                    }
-                    {pages.map(p => (
-                        <li className="page-item">
-                            <a 
-                                className="page-link pg-style" 
-                                href="JavaScript:void(0);"
-                                onClick={() => paginate(`${albums.href.split("offset=")[0]}offset=${(p-1)*20}&limit=20`)}>
-                                    {p}
-                            </a>
-                        </li>
-                    ))}
-                    {albums.next ? 
-                        <li className="page-item">
-                            <a 
-                                className="page-link pg-style" 
-                                href="JavaScript:void(0);"
-                                onClick={() => paginate(albums.next)}>
-                                    Next
-                            </a>
-                        </li>
-                        :
-                        <li className="page-item disabled">
-                            <a className="page-link pg-style" href="JavaScript:void(0);" tabIndex="-1">Next</a>
-                        </li>
-                    }
-                </ul>
-            </nav> */}
         </div>         
     );
 }

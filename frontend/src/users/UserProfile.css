@@ -21,7 +21,6 @@
 
 .add-btn:hover {
     background-color: rgba(0, 0, 0, 0.178) !important;
-    /* color: rgba(255, 255, 255, 0.719) !important; */
 }
 
 .playlist-btn {
@@ -46,12 +45,10 @@
     border: 1px solid rgba(255, 255, 255, 0.411) !important;
     border-radius: 3px !important;
     background-color: rgba(255, 254, 254, 0.815) !important;
-    /* color: rgba(255, 255, 255, 0.719) !important; */
 }
 
 .cancel {
     margin-right: 5px;
-    /* text-align: end; */
 }
 
 .btns {

@@ -3,12 +3,17 @@ import { Redirect } from "react-router-dom";
 import UserContext from "../auth/UserContext";
 import SpotaflyApi from "../api/api";
 import ArtistList from "../artists/ArtistList";
-// import AlbumList from "../albums/AlbumList";
-// import LoadingSpinner from "../common/LoadingSpinner";
 import SearchForm from "../discover/SearchForm";
 import "./ArtistSearch.css";
 
-
+/** Artist Search page.
+ *
+ * Renders SearchForm and displays search results.
+ *
+ * Routed at /discover/artists
+ *
+ * Routes -> ArtistSearch -> SearchForm -> ArtistList
+ */
 
 function ArtistSearch() {
     const { currentUser } = useContext(UserContext);
@@ -18,38 +23,32 @@ function ArtistSearch() {
     async function search(searchTerm) {
         setSearchComplete(false);
         let res = await SpotaflyApi.getArtists(searchTerm);
-        console.log("searching...");
-        console.log("result from search function in ArtistSearch.js", res.result);
-        console.log("result from search function in ArtistSearch.js", res.result);
         setArtists(res.result);
         setSearchComplete(true);
     }
 
     async function paginate(url) {
-        // setSearchComplete(false);
         let res = await SpotaflyApi.paginate(url);
         setArtists(res.result);
         setSearchComplete(true);
     }
- 
 
     function showArtists() {
         if(artists.artists.items.length) {
             return (
-                <div>
+                <div className="mt-5">
                     <p className="lead numResults">Results {Number(artists.artists.offset)+1}-{Number(artists.artists.offset)+artists.artists.items.length} of {artists.artists.total}</p>
                     <ArtistList artists={artists} paginate={paginate} />
                 </div>
-            )
+            );
         } else {
             return (
                 <p className="lead">There are no results.</p>
-            )
+            );
         }
     }
 
     if (!currentUser) return <Redirect to="/login" />
-
 
     return (
         

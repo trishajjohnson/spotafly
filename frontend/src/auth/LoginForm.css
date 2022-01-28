@@ -1,9 +1,3 @@
-.LoginForm {
-    background: url("https://swall.teahub.io/photos/small/341-3414442_free-art-wallpaper-bright-colors.jpg") no-repeat center center fixed;
-    height: 100vh;
-    background-size: cover;
-}
-
 .loginBtn {
     border-color: black !important;
     text-align: left !important;

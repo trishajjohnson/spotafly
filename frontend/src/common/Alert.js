@@ -1,5 +1,9 @@
 import React from "react";
 
+/** Presentational component for showing bootstrap-style alerts.
+ *
+ * { LoginForm, SignupForm, EditProfileForm } -> Alert
+ **/
 
 function Alert({ type = "danger", messages = [] }) {
 

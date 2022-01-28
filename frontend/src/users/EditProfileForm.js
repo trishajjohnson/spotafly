@@ -5,6 +5,16 @@ import { Link, useHistory, Redirect } from "react-router-dom";
 import Alert from "../common/Alert";
 import "./EditProfileForm.css";
 
+/** Profile editing form.
+ *
+ * Displays profile form and handles changes to local form state.
+ * Submitting the form calls the API to save, and triggers user reloading
+ * throughout the site.
+ *
+ * Routed as /profile/:username/edit
+ * 
+ * Routes -> UserProfile -> EditProfileForm
+ */
 
 function EditProfileForm() {
   const { currentUser, setCurrentUser } = useContext(UserContext);
@@ -13,12 +23,10 @@ function EditProfileForm() {
     firstName: currentUser.firstName,
     lastName: currentUser.lastName,
     email: currentUser.email,
-    img_url: currentUser.img_url,
-    password: ""
+    password: "",
+    img_url: currentUser.img_url
   });
   const history = useHistory();
-
-
   const [formErrors, setFormErrors] = useState([]);
 
   const handleChange = evt => {
@@ -36,8 +44,8 @@ function EditProfileForm() {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        img_url: formData.img_url,
-        password: formData.password
+        password: formData.password,
+        img_url: formData.img_url
     };
 
     let username = formData.username;
@@ -45,13 +53,13 @@ function EditProfileForm() {
 
     try {
         updateUser = await SpotaflyApi.updateProfile(username, profileData);
+        setFormData(formData => ({...formData, password: ""}));
+        setCurrentUser(updateUser);
+        history.push(`/profile/${currentUser.username}`);
     } catch(e) {
         console.log(e);
         setFormErrors(e);
     }
-    setFormData(formData => ({...formData, password: ""}));
-    setCurrentUser(updateUser);
-    history.push(`/profile/${currentUser.username}`);
   };
 
   if(!currentUser) return <Redirect to="/login" />

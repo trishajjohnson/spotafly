@@ -2,8 +2,17 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./ArtistCard.css";
 
+/** Shows limited information about an artist.
+ *
+ * Is rendered by ArtistList to show a "card" for each artist.
+ * Clicking on this card will navigate to individual artist's
+ * profile page.
+ *
+ * ArtistList -> ArtistCard
+ */
+
 function ArtistCard({artist}) {
-    console.log("artist in ArtistCard", artist);
+
     return (
         
         <div className="ArtistCard">

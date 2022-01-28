@@ -7,6 +7,14 @@ import { Redirect } from "react-router-dom";
 import { Dropdown, Button, Modal } from 'react-bootstrap';
 import './AlbumDetail.css';
 
+/** Album Detail page.
+ *
+ * Renders information about album, along with the songs on the album.
+ *
+ * Routed at /albums/:id
+ *
+ * Routes -> AlbumDetail
+ */
 
 function AlbumDetail() {
     const { currentUser, addToFavorites, removeFromFavorites, addToPlaylist } = useContext(UserContext);
@@ -65,9 +73,9 @@ function AlbumDetail() {
 
     async function createNewAndAddToPlaylist(evt) {
         const newPlaylist = await SpotaflyApi.createPlaylist(formData);
-        const addSong = await addToPlaylist(songIdToAdd, newPlaylist.playlist_id);
-        console.log("addSong in AlbumDetail", addSong);
+        await addToPlaylist(songIdToAdd, newPlaylist.playlist_id);
         setPlaylists([...playlists, newPlaylist]);
+        currentUser.playlists = [...playlists, newPlaylist];
         setFormData({
             playlist_name: "",
             img_url: "",
@@ -126,9 +134,7 @@ function AlbumDetail() {
 
     if(!album) return <LoadingSpinner />;
 
-    if (!currentUser) {
-        return <Redirect to="/login" />
-    }
+    if (!currentUser) return <Redirect to="/login" />
 
     return (
 

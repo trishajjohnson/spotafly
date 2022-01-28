@@ -15,6 +15,15 @@ import SongSearch from "../songs/SongSearch";
 import UserProfile from "../users/UserProfile";
 import EditProfileForm from "../users/EditProfileForm";
 
+/** Site-wide routes.
+ *
+ * Parts of site should only be visitable when logged in. Those routes are
+ * protected using authorization middleware on the backend, checking if
+ * user is logged in and, in certain circumstances, if user is correct user.
+ *
+ * Visiting a non-existant route redirects to the homepage.
+ */
+
 function Routes({login, signup}) {
   
     return (
@@ -32,6 +41,7 @@ function Routes({login, signup}) {
             <Route exact path="/playlists/:id">
                 <PlaylistDetail />
             </Route>
+
             <Route exact path="/profile/:username">
                 <UserProfile />
             </Route>
@@ -56,12 +66,12 @@ function Routes({login, signup}) {
                 <ArtistSearch />
             </Route>
 
-            <Route exact path="/artists/:id">
-                <ArtistProfile />
-            </Route>
-
             <Route exact path="/discover/songs">
                 <SongSearch />
+            </Route>
+
+            <Route exact path="/artists/:id">
+                <ArtistProfile />
             </Route>
 
             <Route exact path="/albums/:id">
@@ -71,7 +81,6 @@ function Routes({login, signup}) {
             <Route exact path="/genres/:genre">
                 <GenreSearch />
             </Route>
-
 
             <Route exact path="/">
               <Homepage />

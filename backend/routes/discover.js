@@ -13,14 +13,9 @@ const router = express.Router();
 
 
 router.get("/paginate", ensureLoggedIn, async function (req, res, next) {
-    
     try {
-        console.log("inside paginate in discover routes BEFORE calling API");
         const { url } = req.query;
-        console.log("url in discover routes paginate", url);
         const result = await Discover.paginate(url);
-        console.log("inside discover/paginate route AFTER calling Discover.paginate()")
-        console.log("result res in discover paginate route", result)
         return res.json({ result });
     } catch (err) {
         return next(err);

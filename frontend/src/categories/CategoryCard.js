@@ -2,14 +2,16 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./CategoryCard.css";
 
-function CategoryCard({category}) {
+/** Shows the name of a category to search music by.
+ *
+ * Is rendered by CategoriesList to show a "card" for each category.
+ * Clicking on this card will navigate to search page corresponding
+ * to the category.
+ *
+ * CategoriesList -> CategoryCard
+ */
 
-    // function handleClick(evt) {
-    //     evt.preventDefault();
-    //     if(hasApplied(job.id)) return; 
-    //     applyToJob(job.id);
-    //     setApplied(true);
-    // }
+function CategoryCard({category}) {
 
     return (
         

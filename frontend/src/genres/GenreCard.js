@@ -2,14 +2,16 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./GenreCard.css";
 
-function GenreCard({genre}) {
+/** Card displays each individual genre available for searching.
+ *
+ * Is rendered by GenreList to show a "card" for each genre.
+ * Clicking on this card will navigate to a search for that will
+ * filter artists by genre.
+ *
+ * GenreList -> GenreCard
+ */
 
-    // function handleClick(evt) {
-    //     evt.preventDefault();
-    //     if(hasApplied(job.id)) return; 
-    //     applyToJob(job.id);
-    //     setApplied(true);
-    // }
+function GenreCard({genre}) {
 
     return (
         

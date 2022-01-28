@@ -13,7 +13,7 @@ import { Link, NavLink } from "react-router-dom";
 
 function Navbar({logout}) {
   const { currentUser } = useContext(UserContext);
-  console.log("currentUser", currentUser);
+
   function loggedIn() {
     return (
       <>

@@ -3,6 +3,16 @@ import { useHistory } from 'react-router-dom';
 import Alert from "../common/Alert";
 import "./SignupForm.css";
 
+/** Signup form.
+ *
+ * Shows form and manages update to state on changes.
+ * On submission:
+ * - calls signup function prop
+ * - redirects to / route
+ *
+ * Routes -> SignupForm -> Alert -> Homepage
+ * Routed as /signup
+ */
 
 function SignupForm({signup}) {
   const history = useHistory();
@@ -30,11 +40,12 @@ function SignupForm({signup}) {
     if(res.success) {
         history.push('/');
     } else {
-        setFormErrors(res.errors);
+        setFormErrors(res.e);
     }
   };
 
   return (
+
     <div className="SignupForm">
       <h1 className="pt-5">Sign Up</h1>
       <p className="lead">Already a member? <a className="signup-link" href="/login">Login here</a></p>
@@ -114,6 +125,7 @@ function SignupForm({signup}) {
         </div>
       </form>
     </div>
+    
   );
 }
 

@@ -1,10 +1,20 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Redirect, Link } from "react-router-dom";
 import UserContext from "../auth/UserContext";
 import SpotaflyApi from "../api/api";
 import AlbumList from "../albums/AlbumList";
 import LoadingSpinner from "../common/LoadingSpinner";
 import "./Homepage.css";
+
+/** Homepage component.
+ *
+ * Upon signup or login, user redirected to / route where New Releases
+ * are rendered.  Hidden if no currentUser.
+ *
+ * Routed at /
+ *
+ * Routes -> Hompage -> AlbumList -> AlbumCard
+ */
 
 function Homepage() {
   const { currentUser } = useContext(UserContext);
@@ -14,10 +24,8 @@ function Homepage() {
   useEffect(function loadNewReleases() {
     async function getNewReleases() {
         try {
-            console.log("inside useEffect of GenreSearch.js before SpotaflyApi call")
             const newArtistReleases = await SpotaflyApi.getNewReleases();
             setNewReleases(newArtistReleases);
-            console.log("newReleases after SpotaflyApi call inside useEffect GenreSearch.js", newReleases)
         } catch(e) {
             console.log(e);
         }
@@ -27,13 +35,13 @@ function Homepage() {
 
   function showNewReleases() {
     const albums = newReleases.albums;
-    console.log("newReleases in showReleases() of Homepage.js", albums)
+
     return (
         <div>
             <h2 className="pt-3">New Releases</h2>
             <AlbumList albums={albums} paginate={paginate} />
         </div>
-    )
+    );
   } 
 
   async function paginate(url) {
@@ -42,9 +50,9 @@ function Homepage() {
     setSearchComplete(true);
   }
 
-  // if (!currentUser) return <Redirect to="/login" />
+  if (!currentUser) return <Redirect to="/login" />
 
-  // if(!newReleases) return <LoadingSpinner />
+  if(!newReleases) return <LoadingSpinner />
   
   return (
       <div className="Homepage">

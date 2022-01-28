@@ -7,7 +7,25 @@ import LoadingSpinner from "./common/LoadingSpinner";
 import jwt from "jsonwebtoken";
 import './App.css';
 
+// Key name for storing token in localStorage for "remember me" re-login
+
 const STORE_TOKEN_ID = "token-id";
+
+/** Spotafly application.
+ *
+ * - infoLoaded: has user data been pulled from API?
+ *   (this manages spinner for "loading...")
+ *
+ * - currentUser: user obj from API, used to tell if someone is 
+ * logged in. This is passed around via context throughout app.
+ *
+ * - token: for logged in users, this is their authentication JWT.
+ *   It is required to be set for most API calls. This is initially 
+ *   read from localStorage and synced to there via the 
+ *   useLocalStorage hook.
+ *
+ * App -> Routes
+ */
 
 function App() {
   const [infoLoaded, setInfoLoaded] = useState(false);
@@ -49,11 +67,12 @@ function App() {
   async function signup(signupData) {
     try {
       let token = await SpotaflyApi.signup(signupData);
-      localStorage.setItem(STORE_TOKEN_ID, token);
+      localStorage.setItem(STORE_TOKEN_ID, token.token);
       setToken(localStorage.getItem(STORE_TOKEN_ID));
       return { success: true };
     } catch(e) {
       console.log("Errors: ", e);
+      return { success: false, e };
     }
   }
 
@@ -84,7 +103,6 @@ function App() {
   }
 
   async function addToPlaylist(songId, playlistId) {
-    console.log("songId in App.js addToPlaylist", songId);
     try {
       await SpotaflyApi.addToPlaylist(songId, playlistId, currentUser.username);
     
@@ -114,9 +132,7 @@ function App() {
     }
   }
 
-
   if(!infoLoaded) return <LoadingSpinner />;
-
 
   return (
     <UserContext.Provider

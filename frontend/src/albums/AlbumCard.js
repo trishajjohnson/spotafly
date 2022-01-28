@@ -2,8 +2,16 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./AlbumCard.css";
 
-function AlbumCard({album}) {
+/** Shows limited information about an album.
+ *
+ * Is rendered by AlbumList to show a "card" for each album.
+ * Clicking on this card will navigate to individual album's
+ * detail page.
+ *
+ * AlbumList -> AlbumCard
+ */
 
+function AlbumCard({album}) {
 
     return (
         

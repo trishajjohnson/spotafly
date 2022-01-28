@@ -11,12 +11,13 @@ const {
 
 const { BCRYPT_WORK_FACTOR } = require("../config.js");
 
-/** Related functions for users. */
+/** User model and related functions for users. */
 
 class User {
+
   /** authenticate user with username, password.
    *
-   * Returns { username, first_name, last_name, email }
+   * Returns { username, first_name, last_name, email, img_url }
    *
    * Throws UnauthorizedError if user not found or wrong password.
    **/
@@ -50,8 +51,11 @@ class User {
 
   /** Register user with data.
    *
-   * Returns { username, firstName, lastName, email }
+   * Returns { username, firstName, lastName, email, img_url }
    *
+   * If img_url is not provided upon signup, function will provide a 
+   * default image.
+   * 
    * Throws BadRequestError on duplicates.
    **/
 
@@ -97,7 +101,10 @@ class User {
         ],
     );
     
-    const favorites = await db.query(
+    // Upon registration, a "Favorite Songs" playlist is created and
+    // inserted into user's playlists.
+
+    await db.query(
       `INSERT INTO playlists (playlist_name, img_url, username)
        VALUES ($1, $2, $3)`,
     ["Favorite Songs", "https://ak.picdn.net/shutterstock/videos/3361085/thumb/1.jpg", username]);
@@ -109,9 +116,10 @@ class User {
 
   /** Given a username, return data about user.
    *
-   * Returns { username, first_name, last_name, favorite_songs, followed_artists }
-   *   where favorite_songs is { id, song_title, album_title, artist_name, user_id }
-   *   and followed_artists is { artist_id, user_id }
+   * Returns { username, first_name, last_name, playlists, img_url, favoriteSongs }
+   * where playlists are { playlist_id, playlist_name, img_url, username }
+   * and favoriteSongs is an array of song_ids of the songs included int he "Favorite
+   * Songs" playlist. 
    *
    * Throws NotFoundError if user not found.
    **/
@@ -137,7 +145,6 @@ class User {
        FROM playlists AS p
        WHERE p.username = $1 AND p.playlist_name = $2`, 
       [username, "Favorite Songs"]);
-    console.log("favoritePlaylist", favoritePlaylist);
 
     const favoriteSongs = await db.query(
       `SELECT s.song_id
@@ -145,9 +152,8 @@ class User {
        WHERE s.playlist_id = $1`, 
       [favoritePlaylist.rows[0].playlist_id]);
 
-    console.log("favoriteSongs in get user model upon login", favoriteSongs);
     user.favoriteSongs = favoriteSongs.rows.map(s => s.song_id);
-    console.log("user.favoriteSongs in backend user model", user.favoriteSongs);
+
     const userPlaylistsRes = await db.query(
           `SELECT p.playlist_id, p.playlist_name, p.img_url
            FROM playlists AS p
@@ -155,12 +161,6 @@ class User {
 
     user.playlists = userPlaylistsRes.rows.map(p => p);
 
-    // const userFollowedArtistsRes = await db.query(
-    //       `SELECT a.artist_id, a.artist_name
-    //        FROM followed_artists AS a
-    //        WHERE a.user_id = $1`, [username]);
-
-    // user.followed_artists = userFollowedArtistsRes.rows.map(a => a.id);
     return user;
   }
 
@@ -170,21 +170,27 @@ class User {
    * all the fields; this only changes provided ones.
    *
    * Data can include:
-   *   { firstName, lastName, password, email }
+   * { firstName, lastName, password, email, img_url }
+   * Password is only used to verify correct user and password
+   * before updating.  Password is not changed. If password is incorrect,
+   * Alert will be thrown.
    *
-   * Returns { username, firstName, lastName, email }
+   * Returns { username, firstName, lastName, email, img_url }
    *
    * Throws NotFoundError if not found.
    *
-   * WARNING: this function can set a new password.
-   * Callers of this function must be certain they have validated inputs to this
-   * or serious security risks are opened.
    */
 
   static async update(username, data) {
-    if (data.password) {
-      data.password = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
-    }
+    const userRes = await db.query(
+      `SELECT password
+       FROM users
+       WHERE username = $1`,
+    [username],
+    );
+    const isValid = await bcrypt.compare(data.password, userRes.rows[0].password);
+
+    if (!isValid) throw new BadRequestError("Incorrect password");
 
     const { setCols, values } = sqlForPartialUpdate(
         data,
@@ -200,20 +206,44 @@ class User {
                       RETURNING username,
                                 first_name AS "firstName",
                                 last_name AS "lastName",
+                                img_url AS "imgUrl",
                                 email`;
+
     const result = await db.query(querySql, [...values, username]);
     const user = result.rows[0];
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
 
     delete user.password;
+
+    const favoritePlaylist = await db.query(
+      `SELECT p.playlist_id
+       FROM playlists AS p
+       WHERE p.username = $1 AND p.playlist_name = $2`, 
+      [username, "Favorite Songs"]);
+
+    const favoriteSongs = await db.query(
+      `SELECT s.song_id
+       FROM songs_playlists AS s
+       WHERE s.playlist_id = $1`, 
+      [favoritePlaylist.rows[0].playlist_id]);
+
+    user.favoriteSongs = favoriteSongs.rows.map(s => s.song_id);
+
+    const userPlaylistsRes = await db.query(
+          `SELECT p.playlist_id, p.playlist_name, p.img_url
+           FROM playlists AS p
+           WHERE p.username = $1`, [username]);
+
+    user.playlists = userPlaylistsRes.rows.map(p => p);
+
     return user;
   }
 
   /** Add song to favorites: update db, returns undefined.
    *
    * - username: username adding song to favorites
-   * - artist_id: artist_id
+   * - song_id: id of song being added
    **/
 
   static async addSongToFavorites(username, songId) {
@@ -248,6 +278,12 @@ class User {
         [songId, favoritesPlaylist.rows[0].playlist_id]);
   }
 
+  /** Remove song from favorites: update db, returns undefined.
+   *
+   * - username: username adding song to favorites
+   * - song_id: id of song being added
+   **/
+
   static async removeSongFromFavorites(username, songId) {
     const preCheck2 = await db.query(
       `SELECT username
@@ -264,7 +300,7 @@ class User {
        WHERE playlist_name = $1 AND username = $2`, 
       ["Favorite Songs", username]);
 
-    let result = await db.query(
+    const result = await db.query(
         `DELETE
         FROM songs_playlists
         WHERE playlist_id = $1 AND song_id = $2
@@ -277,8 +313,18 @@ class User {
     if (!song) throw new NotFoundError(`No song: ${songId}`);
   }
 
+  /** Creates new playlist: update db, returns undefined.
+   *
+   * - username: username creating playlist
+   * - playlist_name: name of playlist (required)
+   * - img_url: URL for playlist image (optional - default image provided)
+   * 
+   * returns new playlist
+   **/
+
   static async createNewPlaylist(playlist_name, img_url, username) {
     let result;
+
     if(img_url !== "") {
       result = await db.query(
             `INSERT INTO playlists (playlist_name, img_url, username)
@@ -295,11 +341,18 @@ class User {
     }
 
     const playlist = result.rows[0];
-    console.log("playlist in user model", playlist);
+
     if (!playlist) throw new BadRequestError(`Playlist not added`);
 
     return playlist;
   }
+
+  /** Deletes playlist from DB: update db, returns playlist_id.
+   *
+   * - playlist_Id: playlist_id
+   * 
+   * returns playlist_id
+   **/
 
   static async removePlaylist(playlistId) {
     const result = await db.query(
@@ -316,6 +369,12 @@ class User {
     return playlist;
   }
 
+  /** Add song to playlist: update db, returns undefined.
+   *
+   * - playlist_id: playlist_id
+   * - song_id: id of song being added
+   **/
+
   static async addSongToPlaylist(playlistId, songId) {
     const result = await db.query(
       `SELECT playlist_id
@@ -326,7 +385,7 @@ class User {
     const playlist = result.rows[0];
 
     if(!playlist) throw new NotFoundError(`No playlist found: ${playlistId}`);
-      console.log("songId in addSongToPlaylist user model", songId);
+
     const preCheck = await db.query(
           `SELECT song_id
            FROM songs_playlists
@@ -343,6 +402,12 @@ class User {
         [songId, playlistId]);
   }
 
+  /** Remove song from playlist: update db, returns song_id.
+   *
+   * - playlist_id: playlist_id for song to be removed from
+   * - song_id: id of song being removed
+   **/
+
   static async removeSongFromPlaylist(songId, playlistId) {
     let result = await db.query(
       `DELETE
@@ -357,10 +422,16 @@ class User {
   if (!song) throw new NotFoundError(`No song: ${songId}`);
 
   return song;
-}
+  }
 
+   /** Given a playlist_id, return data about playlist.
+   *
+   * Returns { playlist_id, playlist_name, img_url, username }
+   *
+   * Throws NotFoundError if playlist not found.
+   **/
 
-  static async getPlaylist(id, username) {
+  static async getPlaylist(id) {
     const playlistRes = await db.query(
           `SELECT playlist_id,
                   playlist_name,
@@ -383,16 +454,9 @@ class User {
             
     playlist.tracks = playlistSongsRes.rows.map(t => t.song_id);
 
-    console.log("playlist in getPlaylist user model", playlist);
     return playlist;
   }
 
-
-  /** Add artist to followed_artists: update db, returns undefined.
-   *
-   * - username: username adding song to favorites
-   * - artist_id: artist_id
-   **/
 }
 
 

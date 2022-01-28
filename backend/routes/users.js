@@ -8,7 +8,6 @@ const express = require("express");
 const { ensureCorrectUser, ensureLoggedIn } = require("../middleware/auth");
 const { BadRequestError } = require("../expressError");
 const User = require("../models/user");
-const { createToken } = require("../helpers/tokens");
 const userUpdateSchema = require("../schemas/userUpdate.json");
 const newPlaylistSchema = require("../schemas/newPlaylist.json");
 
@@ -17,8 +16,8 @@ const router = express.Router();
 
 /** GET /[username] => { user }
  *
- * Returns { username, firstName, lastName, favoriteSongs, followedArtists }
- *   where jobs is { id, title, companyHandle, companyName, state }
+ * Returns { username, firstName, lastName, email, img_url, favoriteSongs, playlists }
+ *   where playlists is { playlist_id, playlist_name, img_url, username }
  *
  * Authorization required: same user-as-:username
  **/
@@ -38,9 +37,9 @@ router.get("/:username", ensureLoggedIn, async function (req, res, next) {
  * Data can include:
  *   { firstName, lastName, password, email, img_url }
  *
- * Returns { username, firstName, lastName, email, isAdmin }
+ * Returns { username, firstName, lastName, email, img_url, favoriteSongs, playlists }
  *
- * Authorization required: admin or same-user-as-:username
+ * Authorization required: same-user-as-:username
  **/
 
 router.patch("/:username", ensureCorrectUser, async function (req, res, next) {
@@ -59,9 +58,9 @@ router.patch("/:username", ensureCorrectUser, async function (req, res, next) {
 });
 
 
-/** POST /[username]/jobs/[id]  { state } => { application }
+/** POST /[username]/favorites/[id]/add 
  *
- * Returns {"applied": jobId}
+ * Returns {"added": songId}
  *
  * Authorization required: same-user-as-:username
  * */
@@ -69,7 +68,6 @@ router.patch("/:username", ensureCorrectUser, async function (req, res, next) {
 router.post("/:username/favorites/add", ensureCorrectUser, async function (req, res, next) {
   try {
     const { username, songId } = req.body;
-    console.log("username, songId", username, songId);
     await User.addSongToFavorites(username, songId);
     return res.json({ added: songId });
   } catch (err) {
@@ -77,10 +75,16 @@ router.post("/:username/favorites/add", ensureCorrectUser, async function (req, 
   }
 });
 
+/** DELETE /[username]/favorites/[id]/remove 
+ *
+ * Returns {"deleted": songId}
+ *
+ * Authorization required: same-user-as-:username
+ * */
+
 router.delete("/:username/favorites/remove", ensureCorrectUser, async function (req, res, next) {
   try {
     const { username, songId } = req.body;
-    console.log("username, songId", username, songId);
     await User.removeSongFromFavorites(username, songId);
     return res.json({ deleted: songId });
   } catch (err) {
@@ -88,46 +92,56 @@ router.delete("/:username/favorites/remove", ensureCorrectUser, async function (
   }
 });
 
-// Add new playlist to DB
+/** POST /[username]/playlists/[id]/add-new
+ *
+ * Returns { newPlaylist }
+ *
+ * Authorization required: same-user-as-:username
+ * */
 
 router.post("/:username/playlists/add-new", ensureCorrectUser, async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, newPlaylistSchema);
     if (!validator.valid) {
       const errs = validator.errors.map(e => e.stack);
-      throw new BadRequestError(errs);
+      throw new BadRequestError("You must name your playlist.");
     }
 
     const { username, playlist_name, img_url } = req.body;
-    console.log("req.body", req.body);
     const result = await User.createNewPlaylist(playlist_name, img_url, username);
-    console.log("result in add playlist route", result);
     return res.json({ result });
   } catch (err) {
     return next(err);
   }
 });
 
-// Deletes playlist from DB
+/** DELETE /[username]/playlists/[id]/remove 
+ *
+ * Returns {"deleted": playlist}
+ *
+ * Authorization required: same-user-as-:username
+ * */
 
 router.delete("/:username/playlists/:id/remove", ensureCorrectUser, async function (req, res, next) {
   try {
     const { playlistId } = req.body;
-    console.log("req.body", req.body);
     const result = await User.removePlaylist(playlistId);
-    console.log("result in remove playlist route", result);
     return res.json({ deleted: result });
   } catch (err) {
     return next(err);
   }
 });
 
-// Adds song to playlist
+/** POST /[username]/playlists/[id]/add-song
+ *
+ * Returns {"added": songId}
+ *
+ * Authorization required: same-user-as-:username
+ * */
 
 router.post("/:username/playlists/:id/add-song", ensureCorrectUser, async function (req, res, next) {
   try {
     const { songId, playlistId } = req.body;
-    console.log("songId and playlistId in add song playlist route", songId, playlistId);
     await User.addSongToPlaylist(playlistId, songId);
     return res.json({ added: songId });
   } catch (err) {
@@ -135,26 +149,34 @@ router.post("/:username/playlists/:id/add-song", ensureCorrectUser, async functi
   }
 });
 
-// Removes song from playlist
+/** DELETE /[username]/playlists/[id]/remove-song 
+ *
+ * Returns {"deleted": songId}
+ *
+ * Authorization required: same-user-as-:username
+ * */
 
 router.delete("/:username/playlists/:id/remove-song", ensureCorrectUser, async function (req, res, next) {
   try {
     const { songId, playlistId } = req.body;
     const result = await User.removeSongFromPlaylist(songId, playlistId);
-    console.log("result in remove song from playlist route", result);
     return res.json({ deleted: result });
   } catch (err) {
     return next(err);
   }
 });
 
-// Fetches playlist with id
+/** GET /[username]/playlists/[id]
+ *
+ * Returns { playlist }
+ *
+ * Authorization required: same-user-as-:username
+ * */
 
 router.get("/:username/playlists/:id", ensureCorrectUser, async function (req, res, next) {
   try {
-    const { id, username } = req.params;
-    const playlist = await User.getPlaylist(id, username);
-    console.log("result in add playlist route", playlist);
+    const { id } = req.params;
+    const playlist = await User.getPlaylist(id);
     return res.json({ playlist });
   } catch (err) {
     return next(err);

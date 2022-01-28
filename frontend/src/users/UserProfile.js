@@ -1,18 +1,27 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useContext } from "react";
 import SpotaflyApi from '../api/api';
-import LoadingSpinner from "../common/LoadingSpinner";
 import UserContext from "../auth/UserContext";
-import { Dropdown, Modal, Button } from 'react-bootstrap';
+import { Modal, Button } from 'react-bootstrap';
 import { Redirect, Link } from "react-router-dom";
 import PlaylistList from "../playlists/PlaylistList";
 import Alert from "../common/Alert";
 import './UserProfile.css';
 
+/** UserProfile component.
+ *
+ * Displays current user's profile details, profile image, name
+ * and a list of their playlists, including their favorite songs.
+ * Protected by authorization middleware from everyone except correct
+ * user.
+ *
+ * Routed at /profile/:username
+ *
+ * Routes -> UserProfile -> PlaylistList -> PlaylistCard
+ */
+
 function UserProfile() {
     const { currentUser } = useContext(UserContext);
     const [playlists, setPlaylists] = useState(currentUser.playlists);
-    console.log("currentUser.playlists", currentUser.playlists);
     const [formData, setFormData] = useState({
         playlist_name: "",
         img_url: "",
@@ -21,7 +30,8 @@ function UserProfile() {
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    
+    const [formErrors, setFormErrors] = useState([]);
+
     const handleChange = evt => {
         const { name, value } = evt.target;
         setFormData(formData => ({
@@ -31,26 +41,24 @@ function UserProfile() {
       };
 
     async function handleClick(evt) {
-        const newPlaylist = await SpotaflyApi.createPlaylist(formData);
-        console.log("newPlaylist", newPlaylist);
-        setPlaylists([...playlists, newPlaylist]);
-        setFormData({
-            playlist_name: "",
-            img_url: "",
-            username: currentUser.username
-        });
-        handleClose();
+        try{
+            const newPlaylist = await SpotaflyApi.createPlaylist(formData);
+            setPlaylists([...playlists, newPlaylist]);
+            setFormData({
+                playlist_name: "",
+                img_url: "",
+                username: currentUser.username
+            });
+            handleClose();
+        } catch(e) {
+            setFormErrors(e);
+        }
     };
 
-    // async function paginate(url) {
-    //     setInfoLoaded(false);
-    //     let res = await SpotaflyApi.paginate(url);
-    //     console.log("res in paginate", res);
-    //     // setPlaylists(res.result);
-    //     setInfoLoaded(true);
-    // }
-
-    
+    function handleCloseClick() {
+        setFormErrors([]);
+        handleClose();
+    }
 
     function showPlaylists() {
         
@@ -61,9 +69,7 @@ function UserProfile() {
             );
     }
 
-    if (!currentUser) {
-        return <Redirect to="/login" />
-    }
+    if (!currentUser) return <Redirect to="/login" />
 
     return (
         <div>
@@ -102,7 +108,7 @@ function UserProfile() {
                             id="img_url" />
                         </div>
                         <div className="mt-3 btns">
-                            <Button className="playlist-btn cancel" onClick={handleClose}>
+                            <Button className="playlist-btn cancel" onClick={handleCloseClick}>
                                 Cancel
                             </Button>
                             <Button className="playlist-btn" onClick={handleClick}>
@@ -111,6 +117,9 @@ function UserProfile() {
 
                         </div>
                     </Modal.Body>
+                    {formErrors.length
+                        ? <Alert type="danger" messages={formErrors} />
+                        : null}
                 </Modal>
                 <div className="mt-5">
                     <h2> Your Playlists</h2>

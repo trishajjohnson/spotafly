@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import React from "react";
 import ArtistCard from "./ArtistCard";
 import "./ArtistList.css";
 
-function ArtistList({artists, paginate}) {
-    console.log("artists passed to ArtistList", artists);
-    const numPages = Math.ceil(artists.artists.total / 20);
-    const [pages, setPages] = useState(Array.from({length: numPages}, (_, i) => i + 1));
+/** Show page with list of artists.
+ *
+ * On search in ArtistSearch, loads artists from API
+ * in ArtistList component.
+ *
+ * This is routed to at /discover/artists
+ *
+ * Routes -> ArtistSearch -> { SearchForm, ArtistList } -> ArtistCard
+ */
 
+function ArtistList({artists, paginate}) {
     
     return (
         
@@ -21,7 +27,7 @@ function ArtistList({artists, paginate}) {
             <nav className="mt-3" aria-label="Page navigation example">
                 <ul className="pagination pagination-sm justify-content-center">
                     {artists.artists.previous ? 
-                        <li className="page-item">
+                        <li className="page-item m-2">
                             <a 
                                 className="page-link pg-style" 
                                 href="JavaScript:void(0);" 
@@ -31,22 +37,13 @@ function ArtistList({artists, paginate}) {
                             </a>
                         </li>
                         :
-                        <li className="page-item disabled">
+                        <li className="page-item m-2 disabled">
                             <a className="page-link pg-style" href="JavaScript:void(0);" tabIndex="-1">Previous</a>
                         </li>
                     }
-                    {pages.map(p => (
-                        <li className="page-item">
-                            <a 
-                                className="page-link pg-style" 
-                                href="JavaScript:void(0);"
-                                onClick={() => paginate(`${artists.artists.href.split("offset=")[0]}offset=${(p-1)*20}&limit=20`)}>
-                                    {p}
-                            </a>
-                        </li>
-                    ))}
+                
                     {artists.artists.next ? 
-                        <li className="page-item">
+                        <li className="page-item m-2">
                             <a 
                                 className="page-link pg-style" 
                                 href="JavaScript:void(0);"
@@ -55,7 +52,7 @@ function ArtistList({artists, paginate}) {
                             </a>
                         </li>
                         :
-                        <li className="page-item disabled">
+                        <li className="page-item m-2 disabled">
                             <a className="page-link pg-style" href="JavaScript:void(0);" tabIndex="-1">Next</a>
                         </li>
                     }

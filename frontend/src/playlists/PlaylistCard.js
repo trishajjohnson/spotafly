@@ -1,7 +1,15 @@
-import React, { useContext } from "react";
-import UserContext from "../auth/UserContext";
+import React from "react";
 import { Link } from "react-router-dom";
 import "./PlaylistCard.css";
+
+/** Shows limited information about a user's playlist.
+ *
+ * Is rendered by PlaylistList to show a "card" for each playlist.
+ * Clicking on this card will navigate to individual playlist's
+ * detail page.
+ *
+ * PlaylistList -> PlaylistCard
+ */
 
 function PlaylistCard({playlist}) {
 
@@ -15,7 +23,6 @@ function PlaylistCard({playlist}) {
                         {playlist.playlist_name}
                     </h6>
                     <p className="card-text playlist-type"><small>playlist</small></p>
-                    {/* <p className="card-text">{album.artists[0].name}</p> */}
                 </div>            
             </Link>
         </div>         

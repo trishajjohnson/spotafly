@@ -1,19 +1,23 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { Redirect, useParams } from "react-router-dom";
 import UserContext from "../auth/UserContext";
 import SpotaflyApi from "../api/api";
 import ArtistList from "../artists/ArtistList";
-import AlbumList from "../albums/AlbumList";
-import LoadingSpinner from "../common/LoadingSpinner";
 import SearchForm from "../discover/SearchForm";
 import "./GenreSearch.css";
 
-
+/** Genre Search page.
+ *
+ * Renders SearchForm and displays search results.
+ *
+ * Routed at /genres/:genre
+ *
+ * Routes -> GenreSearch -> GenreList
+ */
 
 function GenreSearch() {
     const genre = useParams().genre;
     const genreName = `${genre[0].toUpperCase()}${genre.slice(1)}`
-    console.log("genre", genre);
     const { currentUser } = useContext(UserContext);
     const [artists, setArtists] = useState(null);
     const [searchComplete, setSearchComplete] = useState(false);
@@ -21,10 +25,7 @@ function GenreSearch() {
     async function search(searchTerm) {
         setSearchComplete(false);
         let res = await SpotaflyApi.getArtists(searchTerm, genre);
-        console.log("searching...");
-        console.log("result from search function in GenreSearch.js", res.result);
         setArtists(res.result);
-        console.log("artist search result in search function of genreSearch", artists)
         setSearchComplete(true);
     }
 
@@ -35,18 +36,15 @@ function GenreSearch() {
     }
 
     function showArtists() {
-        console.log("artists in show artists", artists)
         return (
-            <div>
+            <div className="mt-5">
                 <p className="lead numResults">Results {Number(artists.artists.offset)+1}-{Number(artists.artists.offset)+artists.artists.items.length} of {artists.artists.total}</p>
                 <ArtistList artists={artists} paginate={paginate} />
             </div>
-        )
+        );
     }
 
-    if (!currentUser) {
-        return <Redirect to="/login" />
-    }
+    if (!currentUser) return <Redirect to="/login" />
 
 
     return (

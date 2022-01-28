@@ -2,8 +2,16 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./SongCard.css";
 
-function SongCard({song}) {
+/** Shows limited information about a song.
+ *
+ * Is rendered bySongList to show a "card" for each song.
+ * Clicking on this card will navigate to the album's detail 
+ * page to which the individual song belongs.
+ *
+ * SongList -> SongCard
+ */
 
+function SongCard({song}) {
 
     return (
         

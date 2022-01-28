@@ -7,7 +7,9 @@ const { API_ACCESS_TOKEN } = require("../config");
 const Buffer = require("buffer").Buffer;
 const { URLSearchParams } = require("url");
 
-/** return Spotify API access_token. */
+/** Requests from Spotify API an access_token in order to call
+ * endpoints, saves it as an evironmental variable, then returns 
+ * token to frontend for authorization. */
 
 async function createToken(user) {
   const url = 'https://accounts.spotify.com/api/token';
@@ -19,15 +21,11 @@ async function createToken(user) {
     },  
     data: new URLSearchParams({grant_type: 'client_credentials'})
   };
-  console.log("authOptions", authOptions)
 
   const token = await axios(url, authOptions);
   process.env.API_ACCESS_TOKEN = token.data.access_token;
-  console.log("access token", token.data.access_token)
-  // process.env.REFRESH_ACCESS_TOKEN = token.data.refresh_token;
   let payload = {
     username: user.username,
-    // access_token: token.data.access_token,
   };
   
   return jwt.sign(payload, SECRET_KEY);

@@ -2,14 +2,16 @@ import React from "react";
 import CategoryCard from "./CategoryCard";
 import "./CategoriesList.css";
 
+/** Displays list of categories to search music by inside Discover component.
+ *
+ * On selection of category, user is navigated to discover/:category.
+ *
+ * This is routed to /discover
+ *
+ * Routes -> Discover -> CategoriesList -> CategoryCard
+ */
+
 function CategoriesList({categories}) {
-    
-    // function handleClick(evt) {
-    //     evt.preventDefault();
-    //     if(hasApplied(job.id)) return; 
-    //     applyToJob(job.id);
-    //     setApplied(true);
-    // }
 
     return (
         

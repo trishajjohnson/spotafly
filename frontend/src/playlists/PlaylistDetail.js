@@ -7,6 +7,16 @@ import { Redirect, useHistory } from "react-router-dom";
 import { Button } from 'react-bootstrap';
 import './PlaylistDetail.css';
 
+/** Playlist Detail page.
+ *
+ * Renders information about playlist, along with the songs that 
+ * belong to it.
+ *
+ * Routed at /playlists/:id
+ *
+ * Routes -> PlaylistDetail
+ */
+
 function PlaylistDetail() {
     const { currentUser, removeFromPlaylist, deletePlaylist } = useContext(UserContext);
     const [playlist, setPlaylist] = useState(null);
@@ -18,7 +28,6 @@ function PlaylistDetail() {
     useEffect(() => {
         async function getPlaylistDetails() {
             const playlist = await SpotaflyApi.getPlaylist(id, currentUser.username);
-            console.log("playlist", playlist.playlist);
             setPlaylist(playlist.playlist);
             if(playlist.playlist.tracks.length > 0) {
                 const result = await SpotaflyApi.getTracks(playlist.playlist.tracks.join(','));
@@ -32,53 +41,44 @@ function PlaylistDetail() {
     
     async function handleDelete(evt) {
         await deletePlaylist(playlist.playlist_id);
-        console.log("deleted");
         history.push(`/profile/${currentUser.username}`);
     }
 
     async function handleClick(evt) {
-        console.log("track id", evt.target.id);
         await removeFromPlaylist(evt.target.id, playlist.playlist_id);
         setTracks(tracks.filter(t => t.id !== evt.target.id));
     }
 
     function createTableRows(tracks) {
-        console.log("tracks in createTableRows", tracks)
         let rows = [];
         for(let i=0; i<tracks.length; i++) {
-            console.log("tracks[i]", tracks[i]);
             const row = createRow(tracks[i]);
             rows.push(row);
         }
-        console.log("rows", rows);
         return rows;
     }
 
     function createRow(track){
-        console.log("inside createRow");
         const ms = track.duration_ms;
         const mins = Math.floor((ms/1000/60) << 0);
         const secs = Math.floor((ms/1000) % 60);
         const trackTime = `${mins}:${(secs < 10 ? '0' : '') + secs} `;
 
         return (
-                <tr className="track-row">
-                    <th scope="row">{track.track_number}</th>
-                    <td className="text-align">{track.name}</td>
-                    <td>
-                        {trackTime}
-                        <i onClick={handleClick} id={track.id} className="far fa-trash-alt remove"></i>
-                    </td>
-                </tr>
+            <tr className="track-row">
+                <th scope="row">{track.track_number}</th>
+                <td className="text-align">{track.name}</td>
+                <td>
+                    {trackTime}
+                    <i onClick={handleClick} id={track.id} className="far fa-trash-alt remove"></i>
+                </td>
+            </tr>
         );
     }
 
-    if (!currentUser) {
-        return <Redirect to="/login" />
-    }
+    if (!currentUser) return <Redirect to="/login" />
     if(!playlist) return <LoadingSpinner />;
     if(!tracks) return <LoadingSpinner />;
-
 
     return (
 

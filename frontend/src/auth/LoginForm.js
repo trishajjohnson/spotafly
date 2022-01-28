@@ -3,6 +3,17 @@ import { useHistory } from 'react-router-dom';
 import Alert from "../common/Alert";
 import "./LoginForm.css";
 
+/** Login form.
+ *
+ * Shows form and manages update to state on changes.
+ * On submission:
+ * - calls login function prop
+ * - redirects to / route
+ *
+ * Routes -> LoginForm -> Alert -> Homepage
+ * Routed as /login
+ */
+
 function LoginForm({login}) {
   const history = useHistory();
   const [formData, setFormData] = useState({
@@ -21,16 +32,16 @@ function LoginForm({login}) {
 
   async function handleSubmit(evt) {
     evt.preventDefault();
-    let res = await login(formData);
-
+    const res = await login(formData);
     if(res.success) {
-        history.push('/');
+      history.push('/');
     } else {
-        setFormErrors(res.errors);
+        setFormErrors(res.e);
     }
   };
 
   return (
+
     <div className="LoginForm">
       <h1 className="pt-5">Member Login</h1>
       <p className="lead">Not yet a member? <a className="signup-link" href="/signup">Signup here</a></p>
@@ -66,6 +77,7 @@ function LoginForm({login}) {
         </div>
       </form>
     </div>
+    
   );
 }
 

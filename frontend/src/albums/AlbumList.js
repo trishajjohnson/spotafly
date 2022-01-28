@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import React from "react";
 import AlbumCard from "./AlbumCard";
 import "./AlbumList.css";
 
+/** Show page with list of albums.
+ *
+ * On search in AlbumSearch, loads albums from API
+ * in AlbumList component.
+ *
+ * This is routed to at /discover/albums
+ *
+ * Routes -> AlbumSearch -> { SearchForm, AlbumList } -> AlbumCard
+ */
+
 function AlbumList({albums, paginate}) {
-    console.log("albums passed to AlbumList", albums)
-    const numPages = Math.ceil(albums.total / 20);
-    console.log("numPages", numPages)
-    const [pages, setPages] = useState(Array.from({length: numPages}, (_, i) => i + 1));
 
     return (
         
@@ -21,7 +27,7 @@ function AlbumList({albums, paginate}) {
             <nav aria-label="Page navigation example mt-3">
                 <ul className="pagination pagination-sm justify-content-center">
                     {albums.previous ? 
-                        <li className="page-item">
+                        <li className="page-item m-2">
                             <a 
                                 className="page-link pg-style" 
                                 href="JavaScript:void(0);" 
@@ -31,22 +37,13 @@ function AlbumList({albums, paginate}) {
                             </a>
                         </li>
                         :
-                        <li className="page-item disabled">
+                        <li className="page-item m-2 disabled">
                             <a className="page-link pg-style" href="JavaScript:void(0);" tabIndex="-1">Previous</a>
                         </li>
                     }
-                    {pages.map(p => (
-                        <li className="page-item">
-                            <a 
-                                className="page-link pg-style" 
-                                href="JavaScript:void(0);"
-                                onClick={() => paginate(`${albums.href.split("offset=")[0]}offset=${(p-1)*20}&limit=20`)}>
-                                    {p}
-                            </a>
-                        </li>
-                    ))}
+                    
                     {albums.next ? 
-                        <li className="page-item">
+                        <li className="page-item m-2">
                             <a 
                                 className="page-link pg-style" 
                                 href="JavaScript:void(0);"
@@ -55,7 +52,7 @@ function AlbumList({albums, paginate}) {
                             </a>
                         </li>
                         :
-                        <li className="page-item disabled">
+                        <li className="page-item m-2 disabled">
                             <a className="page-link pg-style" href="JavaScript:void(0);" tabIndex="-1">Next</a>
                         </li>
                     }

@@ -1,12 +1,19 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Redirect, useParams } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import UserContext from "../auth/UserContext";
 import SpotaflyApi from "../api/api";
 import GenreList from "./GenreList";
 import LoadingSpinner from "../common/LoadingSpinner";
 import "./GenreSelect.css";
 
-
+/** GenreSelect component rendered inside Discover component.
+ *
+ * Displays GenreList of GenreCards for user to narrow their search by.
+ *
+ * Routed at /discover/genres
+ *
+ * Routes -> Discover -> GenreSelect -> GenreList -> CategoryCard
+ */
 
 function GenreSelect() {
     const { currentUser } = useContext(UserContext);
@@ -16,11 +23,8 @@ function GenreSelect() {
     useEffect(function loadGenres() {
         async function getGenres() {
             try {
-                console.log("inside useEffect of Discover.js before SpotaflyApi call")
                 const genreList = await SpotaflyApi.getGenres();
-                console.log("genreList after SpotaflyApi call inside useEffect Discover.js", genreList)
                 setGenres(genreList.genres);
-                console.log("type of genres", typeof genres)
             } catch(e) {
                 console.log(e);
             }
@@ -36,7 +40,7 @@ function GenreSelect() {
                 <GenreList genres={sample} />
                 <button className="btn loadMore-btn" onClick={() => setShowGenrePreview(false)}>Load more</button>
             </div>
-        )
+        );
     } 
 
     function showGenres() {
@@ -46,15 +50,12 @@ function GenreSelect() {
                 <GenreList genres={genres.genres} />
                 <button className="btn loadMore-btn" onClick={() => setShowGenrePreview(true)}>Show less</button>
             </div>
-        )
+        );
     }
 
-    if (!currentUser) {
-        return <Redirect to="/login" />
-    }
+    if (!currentUser) return <Redirect to="/login" />
 
     if(!genres) return <LoadingSpinner />
-
 
     return (
         

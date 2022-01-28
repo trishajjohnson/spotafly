@@ -2,8 +2,17 @@ import React from "react";
 import GenreCard from "./GenreCard";
 import "./GenreList.css";
 
+/** Displays list of genres.
+ *
+ * Upon clicking on GenreCard, navigated to GenreSearch
+ * component page to search artists by genre.
+ *
+ * This is routed to at /discover/genres
+ *
+ * Routes -> Discover -> GenreSelect -> GenreList -> GenreCard
+ */
+
 function GenreList({genres}) {
-    console.log("genres passed to genreList", genres)
 
     return (
         
