@@ -1,3 +1,18 @@
+# FINAL CAPSTONE: SPOTAFLY APP
+
+Spotafly is a music discovery app, similar to Spotify, where users can join the site by registering an account, creating a username and password.  After registering, a user may search for music, either by artist, song, album or genre.  Users may navigate to artist’s profiles or browse and like album tracks.  Once a song is liked, the user may navigate to their own profile and view their favorite songs in a playlist.  From within discovery, users may also create new playlists and add songs to playlists.  Once playlists are created, the user may view their playlists on their profile.  Similar to albums, when clicked, users may navigate to a playlist’s detail page and view the tracks added to it.  From there, the user may remove songs or delete a playlist entirely.
+
+The goal of this project is to provide an application for users to discover new artists, find their favorite artists’ music, and build playlists.  The application will be an evenly focused full stack web application, geared at serving a wide demographic of music lovers.  The application will utilize music data collected from the Spotify API.  The frontend will be built with HTML, CSS and React, while the backend will be built with Express and Node.
+
+## Deployment
+
+The backend application is deployed with Heroku and can be found here: https://app-spotafly.herokuapp.com/.  Frontend is deployed with Surge.
+
+## Tests
+
+Unit and integration tests were written with Jest and Supertest, and can be found in the front and backend.  Tests can be run by using the command 'jest NAME_OF_FILE'.
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
