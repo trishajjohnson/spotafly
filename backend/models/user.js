@@ -29,7 +29,8 @@ class User {
                   password,
                   first_name AS "firstName",
                   last_name AS "lastName",
-                  email
+                  email,
+                  img_url
            FROM users
            WHERE username = $1`,
         [username],
@@ -75,7 +76,7 @@ class User {
     const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
     let profileUrl;
     
-    if(imgUrl === "") {
+    if(!imgUrl || imgUrl === "" || imgUrl === null) {
       profileUrl = "https://i.pinimg.com/474x/65/25/a0/6525a08f1df98a2e3a545fe2ace4be47.jpg";
     } else {
       profileUrl = imgUrl;
@@ -90,7 +91,7 @@ class User {
             img_url,
             email)
            VALUES ($1, $2, $3, $4, $5, $6)
-           RETURNING username, first_name AS "firstName", last_name AS "lastName", img_url as "imgUrl", email`,
+           RETURNING username, first_name AS "firstName", last_name AS "lastName",  email, img_url as "imgUrl"`,
         [
           username,
           hashedPassword,
@@ -110,7 +111,6 @@ class User {
     ["Favorite Songs", "https://ak.picdn.net/shutterstock/videos/3361085/thumb/1.jpg", username]);
 
     const user = result.rows[0];
-
     return user;
   }
 
@@ -129,7 +129,7 @@ class User {
           `SELECT username,
                   first_name AS "firstName",
                   last_name AS "lastName",
-                  img_url AS "imgUrl",
+                  img_url,
                   email
            FROM users
            WHERE username = $1`,
@@ -188,17 +188,21 @@ class User {
        WHERE username = $1`,
     [username],
     );
+
+    if (!userRes.rows[0]) throw new NotFoundError(`No user: ${username}`);
+
+    const { setCols, values } = sqlForPartialUpdate(
+      data,
+      {
+        firstName: "first_name",
+        lastName: "last_name",
+        imgUrl: "img_url"
+      });
+    const usernameVarIdx = "$" + (values.length + 1);
+
     const isValid = await bcrypt.compare(data.password, userRes.rows[0].password);
 
     if (!isValid) throw new BadRequestError("Incorrect password");
-
-    const { setCols, values } = sqlForPartialUpdate(
-        data,
-        {
-          firstName: "first_name",
-          lastName: "last_name"
-        });
-    const usernameVarIdx = "$" + (values.length + 1);
 
     const querySql = `UPDATE users 
                       SET ${setCols} 
@@ -211,8 +215,6 @@ class User {
 
     const result = await db.query(querySql, [...values, username]);
     const user = result.rows[0];
-
-    if (!user) throw new NotFoundError(`No user: ${username}`);
 
     delete user.password;
 
@@ -240,7 +242,7 @@ class User {
     return user;
   }
 
-  /** Add song to favorites: update db, returns undefined.
+  /** Add song to favorites: update db, returns {added: song_id}.
    *
    * - username: username adding song to favorites
    * - song_id: id of song being added
@@ -270,15 +272,18 @@ class User {
 
     const song = preCheck.rows[0];
 
-    if (song) throw new NotFoundError(`Song already in favorites: ${songId}`);
+    if (song) throw new BadRequestError(`Song already in favorites: ${songId}`);
 
-    await db.query(
+    const favorite = await db.query(
           `INSERT INTO songs_playlists (song_id, playlist_id)
-           VALUES ($1, $2)`,
+           VALUES ($1, $2)
+           RETURNING song_id`,
         [songId, favoritesPlaylist.rows[0].playlist_id]);
+
+    if(favorite) return {added: favorite.rows[0].song_id};
   }
 
-  /** Remove song from favorites: update db, returns undefined.
+  /** Remove song from favorites: update db, returns {deleted: song_id}.
    *
    * - username: username adding song to favorites
    * - song_id: id of song being added
@@ -311,6 +316,8 @@ class User {
     const song = result.rows[0];
 
     if (!song) throw new NotFoundError(`No song: ${songId}`);
+    
+    return { deleted: song.song_id }
   }
 
   /** Creates new playlist: update db, returns undefined.
@@ -324,26 +331,22 @@ class User {
 
   static async createNewPlaylist(playlist_name, img_url, username) {
     let result;
-
-    if(img_url !== "") {
-      result = await db.query(
-            `INSERT INTO playlists (playlist_name, img_url, username)
-             VALUES ($1, $2, $3)
-             RETURNING playlist_id, playlist_name, img_url`,
-          [playlist_name, img_url, username]);
-    } else {
+    if(!img_url || img_url === undefined) {
       const default_img = "https://us.123rf.com/450wm/soloviivka/soloviivka1606/soloviivka160600001/59688426-music-note-vector-icon-white-on-black-background.jpg?ver=6";
       result = await db.query(
         `INSERT INTO playlists (playlist_name, img_url, username)
          VALUES ($1, $2, $3)
-         RETURNING playlist_id, playlist_name, img_url`,
+         RETURNING playlist_id, playlist_name, img_url, username`,
       [playlist_name, default_img, username]);
+    } else {
+      result = await db.query(
+            `INSERT INTO playlists (playlist_name, img_url, username)
+             VALUES ($1, $2, $3)
+             RETURNING playlist_id, playlist_name, img_url, username`,
+          [playlist_name, img_url, username]);
     }
 
     const playlist = result.rows[0];
-
-    if (!playlist) throw new BadRequestError(`Playlist not added`);
-
     return playlist;
   }
 
@@ -360,13 +363,12 @@ class User {
        FROM playlists
        WHERE playlist_id = $1
        RETURNING playlist_id`, 
-      [playlistId]);
+    [playlistId]);
 
     const playlist = result.rows[0];
-
     if (!playlist) throw new NotFoundError(`No playlist: ${playlistId}`);
 
-    return playlist;
+    return {deleted: playlist.playlist_id};
   }
 
   /** Add song to playlist: update db, returns undefined.
@@ -394,12 +396,15 @@ class User {
 
     const song = preCheck.rows[0];
 
-    if (song) throw new NotFoundError(`Song already in playlist: ${songId}`);
+    if (song) throw new BadRequestError(`Song already in playlist: ${songId}`);
 
-    await db.query(
+    const added = await db.query(
           `INSERT INTO songs_playlists (song_id, playlist_id)
-           VALUES ($1, $2)`,
+           VALUES ($1, $2)
+           RETURNING song_id`,
         [songId, playlistId]);
+
+    return {added: added.rows[0].song_id}
   }
 
   /** Remove song from playlist: update db, returns song_id.
@@ -409,7 +414,17 @@ class User {
    **/
 
   static async removeSongFromPlaylist(songId, playlistId) {
-    let result = await db.query(
+    const preCheck = await db.query(
+      `SELECT playlist_id
+       FROM playlists
+       WHERE playlist_id = $1`, 
+      [playlistId]);
+    
+    const playlist = preCheck.rows[0];
+
+    if(!playlist) throw new NotFoundError(`No playlist found: ${playlistId}`);
+
+    const result = await db.query(
       `DELETE
       FROM songs_playlists
       WHERE playlist_id = $1 AND song_id = $2
@@ -418,10 +433,10 @@ class User {
   );
 
   const song = result.rows[0];
+  
+  if (!song) throw new BadRequestError(`No song: ${songId}`);
 
-  if (!song) throw new NotFoundError(`No song: ${songId}`);
-
-  return song;
+  return {deleted: song.song_id};
   }
 
    /** Given a playlist_id, return data about playlist.

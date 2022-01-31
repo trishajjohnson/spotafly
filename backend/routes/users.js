@@ -22,7 +22,7 @@ const router = express.Router();
  * Authorization required: same user-as-:username
  **/
 
-router.get("/:username", ensureLoggedIn, async function (req, res, next) {
+router.get("/:username", ensureCorrectUser, async function (req, res, next) {
   try {
     const user = await User.get(req.params.username);
     return res.json({ user });
@@ -58,7 +58,7 @@ router.patch("/:username", ensureCorrectUser, async function (req, res, next) {
 });
 
 
-/** POST /[username]/favorites/[id]/add 
+/** POST /[username]/favorites/add 
  *
  * Returns {"added": songId}
  *
@@ -68,14 +68,14 @@ router.patch("/:username", ensureCorrectUser, async function (req, res, next) {
 router.post("/:username/favorites/add", ensureCorrectUser, async function (req, res, next) {
   try {
     const { username, songId } = req.body;
-    await User.addSongToFavorites(username, songId);
-    return res.json({ added: songId });
+    const result = await User.addSongToFavorites(username, songId);
+    return res.json(result);
   } catch (err) {
     return next(err);
   }
 });
 
-/** DELETE /[username]/favorites/[id]/remove 
+/** DELETE /[username]/favorites/remove 
  *
  * Returns {"deleted": songId}
  *
@@ -85,14 +85,14 @@ router.post("/:username/favorites/add", ensureCorrectUser, async function (req, 
 router.delete("/:username/favorites/remove", ensureCorrectUser, async function (req, res, next) {
   try {
     const { username, songId } = req.body;
-    await User.removeSongFromFavorites(username, songId);
-    return res.json({ deleted: songId });
+    const result = await User.removeSongFromFavorites(username, songId);
+    return res.json(result);
   } catch (err) {
     return next(err);
   }
 });
 
-/** POST /[username]/playlists/[id]/add-new
+/** POST /[username]/playlists/add-new
  *
  * Returns { newPlaylist }
  *
@@ -126,7 +126,7 @@ router.delete("/:username/playlists/:id/remove", ensureCorrectUser, async functi
   try {
     const { playlistId } = req.body;
     const result = await User.removePlaylist(playlistId);
-    return res.json({ deleted: result });
+    return res.json(result);
   } catch (err) {
     return next(err);
   }
@@ -142,8 +142,8 @@ router.delete("/:username/playlists/:id/remove", ensureCorrectUser, async functi
 router.post("/:username/playlists/:id/add-song", ensureCorrectUser, async function (req, res, next) {
   try {
     const { songId, playlistId } = req.body;
-    await User.addSongToPlaylist(playlistId, songId);
-    return res.json({ added: songId });
+    const result = await User.addSongToPlaylist(playlistId, songId);
+    return res.json(result);
   } catch (err) {
     return next(err);
   }
@@ -160,7 +160,7 @@ router.delete("/:username/playlists/:id/remove-song", ensureCorrectUser, async f
   try {
     const { songId, playlistId } = req.body;
     const result = await User.removeSongFromPlaylist(songId, playlistId);
-    return res.json({ deleted: result });
+    return res.json(result);
   } catch (err) {
     return next(err);
   }

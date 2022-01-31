@@ -32,4 +32,4 @@ async function createToken(user) {
 }
 
 
-module.exports = { createToken, API_ACCESS_TOKEN };
+module.exports = { createToken };

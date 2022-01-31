@@ -21,11 +21,12 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   let keys = Object.keys(dataToUpdate);
   if (keys.length === 0) throw new BadRequestError("No data");
   keys = keys.filter(k => k !== "password");
-
+  
   const cols = keys.map((colName, idx) =>
       `"${jsToSql[colName] || colName}"=$${idx + 1}`,
   );
-  let imgUrl = dataToUpdate["img_url"];
+
+  let imgUrl = dataToUpdate["img_url"] || dataToUpdate["imgUrl"];
   
   if(!imgUrl) {
     return {

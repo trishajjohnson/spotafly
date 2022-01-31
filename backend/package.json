@@ -4,8 +4,14 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest -i",
     "start": "node server.js"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "config.js"
+    ]
   },
   "author": "",
   "license": "ISC",
@@ -20,6 +26,7 @@
     "jsonschema": "^1.4.0",
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.7.1",
-    "qs-stringify": "^1.2.1"
+    "qs-stringify": "^1.2.1",
+    "supertest": "^6.2.2"
   }
 }

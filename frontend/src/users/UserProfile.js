@@ -74,7 +74,7 @@ function UserProfile() {
     return (
         <div>
             <div className="UserProfile">
-                <img className="UserProfile-img mt-3 mb-3" src={currentUser.imgUrl} alt={currentUser.username} />
+                <img className="UserProfile-img mt-3 mb-3" src={currentUser.img_url} alt={currentUser.username} />
                 <h1>{currentUser.firstName} {currentUser.lastName}</h1>
                 
                 <div>
