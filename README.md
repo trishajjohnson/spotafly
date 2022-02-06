@@ -8,7 +8,7 @@ The goal of this project is to provide an application for users to discover new 
 
 ## Deployment
 
-The backend application is deployed with Heroku and can be found here: https://app-spotafly.herokuapp.com/.  Frontend is deployed with Surge.
+The backend application is deployed with Heroku and can be found here: https://app-spotafly.herokuapp.com/.  Frontend is deployed with Surge and can be found here: https://spotafly.surge.sh/.
 
 ## Tests
 
